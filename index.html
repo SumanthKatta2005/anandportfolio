@@ -423,6 +423,16 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
 .bday-skip{position:absolute;bottom:calc(11vh + 14px);right:20px;z-index:6;background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.2em;padding:8px 12px}
 .bday-skip:hover{color:var(--ink);border-color:var(--ink)}
 
+/* ---------- end tag ---------- */
+.returns{position:absolute;inset:0;z-index:7;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:opacity 1.2s}
+.returns.on{display:flex}
+.returns.out{opacity:0}
+.returns h3{font-family:'Inter',sans-serif;font-weight:300;font-size:clamp(28px,5vw,64px);letter-spacing:.9em;color:#fff;opacity:0;transform:scale(1.08);filter:blur(10px);transition:opacity 2.6s ease,transform 5s cubic-bezier(.2,.7,.2,1),letter-spacing 5s cubic-bezier(.2,.7,.2,1),filter 2s ease;text-shadow:0 0 30px rgba(255,255,255,.25);padding:0 4vw}
+.returns h3 span{font-weight:600}
+.returns.show h3{opacity:1;transform:scale(1);letter-spacing:.32em;filter:blur(0)}
+.returns p{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(18px,2.2vw,26px);color:#a99c86;margin-top:26px;opacity:0;transform:translateY(8px);transition:opacity 1.2s,transform 1.2s}
+.returns.sub p{opacity:1;transform:none}
+
 /* ---------- birthday overlay ---------- */
 .bday{position:fixed;inset:0;z-index:140;background:#000;display:none;align-items:center;justify-content:center;overflow:hidden}
 .bday.open{display:flex}
@@ -743,6 +753,7 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
   <button class="bday-close" id="bdayClose">✕ CLOSE</button>
   <button class="bday-skip" id="bdaySkip">SKIP TO THE END ›</button>
   <div class="stage" id="stage"></div>
+  <div class="returns" id="returns"><h3><span>SUMANTH</span> WILL RETURN</h3><p>for the milk.</p></div>
 </div>
 
 <script>
@@ -1407,29 +1418,25 @@ async function finale(alive, opts = {}) {
   $("#replayAll").onclick = () => { Confetti.stop(); SFX.rewind(); setTimeout(playSurprise, 700); };
   $("#backSite").onclick = closeSurprise;
 }
-async function epilogue(alive) {
+async function epilogue(alive) {   // end-credits tag
   Confetti.stop(); $("#stage").innerHTML = ""; E("finalBg").className = "final-bg";
-  resetStory(); E("silent").classList.add("on"); SFX.startPiano(); SFX.startProjector();
-  await card("EPILOGUE", `${+CONFIG.birthday.age || 21} years later.`, 2600, alive);
-  await card("", "Sumanth went back to the kirana store.<br><em>He had unfinished business.</em>", 3400, alive); if (!alive()) return;
-  vis("sTag"); await walk(1235, 5200, alive); if (!alive()) return; vis("sTag", false);
-  await card("SUMANTH", "“One packet of milk, please.”", 2700, alive);
-  await card("THE SHOPKEEPER", "“Sir… you ordered this twenty-one years ago.<br>It has expired.<br><em>That’ll be ₹21.</em>”", 4600, alive); if (!alive()) return;
-  vis("milk"); E("sumFlip").classList.add("flipped"); SFX.boing(); await sleep(500);
-  await walk(700, 3000, alive); if (!alive()) return;
-  await card("", "Sumanth finally got the milk.", 2800, alive);
-  await card("", "THE END<br><em>(for real this time)</em>", 3000, alive); if (!alive()) return;
-  SFX.stopPiano(); SFX.stopProjector(); E("silent").classList.remove("on");
-  await sleep(700); if (!alive()) return;
+  const r = E("returns"); r.className = "returns on";
+  await sleep(1400); if (!alive()) return;
+  SFX.boom(); r.classList.add("show");
+  await sleep(4200); if (!alive()) return;
+  r.classList.add("sub"); SFX.key();
+  await sleep(3400); if (!alive()) return;
+  r.classList.add("out"); await sleep(1400); if (!alive()) return;
+  r.className = "returns";
   finale(alive, { quiet: true });
 }
 function skipToEnd() {
   const my = ++token, alive = () => my === token;
-  cleanupStory(); SFX.stopProjector(); $("#stage").innerHTML = ""; E("finalBg").className = "final-bg";
+  cleanupStory(); E("returns").className = "returns"; SFX.stopProjector(); $("#stage").innerHTML = ""; E("finalBg").className = "final-bg";
   finale(alive);
 }
 function closeSurprise() {
-  token++; Confetti.stop(); SFX.stopProjector(); cleanupStory();
+  token++; Confetti.stop(); SFX.stopProjector(); cleanupStory(); E("returns").className = "returns";
   E("finalBg").className = "final-bg"; $("#stage").innerHTML = "";
   $("#bday").classList.remove("open"); document.body.classList.remove("locked");
   SFX.droneTo(.05, 2);
