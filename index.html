@@ -213,6 +213,45 @@ h2{font-family:var(--display);font-weight:400;font-size:clamp(52px,9vw,128px);li
 .socials a:hover{border-color:var(--amber);color:#000;background:var(--amber)}
 .email-text{margin-top:24px;font-family:var(--mono);color:var(--dim);font-size:13px}
 
+/* ---------- anand airlines ---------- */
+.air{background:linear-gradient(180deg,#0b0a09,#0c1422 30%,#0c1422 75%,#0b0a09);overflow:hidden}
+.plane{position:absolute;top:70px;left:-160px;width:120px;color:#cfe3ff;opacity:0;filter:drop-shadow(0 6px 12px rgba(0,0,0,.6))}
+.air.fly .plane{animation:fly 3.2s cubic-bezier(.4,0,.6,1) forwards}
+@keyframes fly{0%{opacity:1;transform:translate(0,40px) rotate(-6deg)}100%{opacity:1;transform:translate(calc(100vw + 320px),-60px) rotate(-10deg)}}
+.air-logo{display:flex;align-items:center;gap:16px;font-family:var(--display);font-size:clamp(56px,9vw,128px);line-height:.9;letter-spacing:.02em}
+.air-logo svg{width:clamp(60px,8vw,110px);color:#4da3ff;transform:rotate(-12deg)}
+.air-logo b{font-weight:400;color:#4da3ff}
+.air-tag{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(22px,2.6vw,32px);color:#d8cfc0;margin-top:10px}
+.air-sub{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:10px}
+.board{margin-top:46px;background:#070707;border:1px solid #1f1f1f;border-radius:10px;padding:20px 22px;font-family:var(--mono);overflow-x:auto;box-shadow:inset 0 2px 30px rgba(0,0,0,.8)}
+.board-top{display:flex;justify-content:space-between;color:#ffd36b;font-size:12px;letter-spacing:.2em;margin-bottom:16px;min-width:max-content;gap:30px}
+.board-row{display:flex;gap:26px;padding:5px 0;min-width:max-content}
+.board-row.head{color:var(--dim);font-size:10px;letter-spacing:.25em;padding-bottom:10px}
+.board{--t:calc(15px * 1.35 + 2px)}.board-row.head span:nth-child(1){width:calc(6 * var(--t))}.board-row.head span:nth-child(2){width:calc(12 * var(--t))}
+.fl{display:inline-block;width:1.35em;height:1.75em;line-height:1.75em;text-align:center;background:linear-gradient(#1c1c1c 50%,#151515 50%);margin-right:2px;border-radius:2px;color:#f3ece0;position:relative;font-size:15px;font-weight:700}
+.fl::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#000}
+.cell.st-amber .fl{color:#ffd36b}.cell.st-red .fl{color:#ff5a4f}.cell.st-green .fl{color:#5fe0a0}
+.air-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:40px;margin-top:50px;align-items:center}
+.pass{display:flex;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
+.pass-main{flex:1;background:#f6f1e7;color:#141210;border-radius:12px 0 0 12px;padding:22px 26px}
+.pass-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:#1d4f91;font-weight:700;border-bottom:1px solid rgba(0,0,0,.12);padding-bottom:10px}
+.pass-route{display:flex;align-items:center;justify-content:space-between;margin:16px 0}
+.pass-route small,.pass-grid small,.pass-stub small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.2em;opacity:.55}
+.pass-route b{font-family:var(--display);font-weight:400;font-size:clamp(44px,5vw,64px);line-height:1}
+.pass-route svg{width:54px;color:#1d4f91}
+.pass-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.pass-grid b{font-family:var(--mono);font-size:13px}.pass-grid i{font-style:normal;opacity:.6;font-size:11px}
+.pass-stub{width:150px;background:#1d4f91;color:#f6f1e7;border-radius:0 12px 12px 0;border-left:2px dashed #f6f1e7;padding:20px 16px;display:flex;flex-direction:column;gap:2px}
+.pass-stub b{font-family:var(--display);font-weight:400;font-size:24px;margin-bottom:8px}
+.barcode{margin-top:auto;height:44px;background:repeating-linear-gradient(90deg,#f6f1e7 0 2px,transparent 2px 4px,#f6f1e7 4px 5px,transparent 5px 8px,#f6f1e7 8px 11px,transparent 11px 13px)}
+.air-actions{display:flex;flex-direction:column;gap:12px}
+.air-actions button{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;background:none;color:var(--ink);border:1px solid var(--line);padding:16px 18px;text-align:left;transition:all .25s}
+.air-actions button:hover{border-color:#4da3ff;color:#4da3ff}
+.air-actions button.denied{animation:shake .35s;border-color:var(--red);color:var(--red)}
+.ann-text{font-family:'IM Fell English',serif;font-style:italic;font-size:19px;line-height:1.5;color:#d8cfc0;min-height:5.5em}
+.fine{font-family:var(--mono);font-size:10px;color:#5a544c;letter-spacing:.08em}
+@media (max-width:860px){.air-grid{grid-template-columns:1fr}.pass{flex-direction:column}.pass-main{border-radius:12px 12px 0 0}.pass-stub{width:auto;border-left:none;border-top:2px dashed #f6f1e7;border-radius:0 0 12px 12px}.fl{font-size:12px}.board{--t:calc(12px * 1.35 + 2px)}}
+
 /* ---------- secret reel ---------- */
 .secret{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 50% 42%,#2b1a07 0,#0b0a09 62%);overflow:hidden}
 .secret h2{margin-top:26px}
@@ -356,6 +395,8 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
 #story .leg{transform-box:fill-box;transform-origin:50% 0}
 @keyframes legA{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
 @keyframes bob{to{transform:translateY(-6px)}}
+#story #sumFlip{transform-origin:0 0;transition:transform .25s}
+#story #sumFlip.flipped{transform:scaleX(-1)}
 #story .jump{animation:sjump .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes sjump{40%{transform:translateY(-70px)}100%{transform:translateY(0)}}
 #story .st{opacity:0;transition:opacity .25s}
@@ -523,6 +564,40 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
     <div class="stats" id="stats"></div>
   </section>
 
+  <!-- ANAND AIRLINES -->
+  <section class="air" id="air" data-scene="ANAND AIRLINES">
+    <svg class="plane" id="plane" viewBox="0 0 64 64" fill="currentColor"><path d="M4 30h40l12-2q6 2 6 4t-6 4l-12-2H4z"/><path d="M30 30L20 8h7l17 22z"/><path d="M30 34L20 56h7l17-22z"/><path d="M8 30L3 18h6l9 12z"/></svg>
+    <div class="eyebrow reveal-up">Sponsored</div>
+    <div class="air-logo reveal-up"><svg viewBox="0 0 64 64" fill="currentColor"><path d="M4 30h40l12-2q6 2 6 4t-6 4l-12-2H4z"/><path d="M30 30L20 8h7l17 22z"/><path d="M30 34L20 56h7l17-22z"/><path d="M8 30L3 18h6l9 12z"/></svg><span>ANAND <b>AIRLINES</b></span></div>
+    <p class="air-tag reveal-up">Always departing. Never arriving.</p>
+    <p class="air-sub reveal-up">Proudly serving one route since 2019: from the front, to the back.</p>
+    <div class="board reveal-up" id="board">
+      <div class="board-top"><span>DEPARTURES · TERMINAL FOREHEAD</span><span id="boardClock">--:--</span></div>
+      <div class="board-row head"><span>FLIGHT</span><span>DESTINATION</span><span>STATUS</span></div>
+      <div id="boardRows"></div>
+    </div>
+    <div class="air-grid">
+      <div class="pass reveal-up">
+        <div class="pass-main">
+          <div class="pass-top"><span>ANAND AIRLINES</span><span>BOARDING PASS</span></div>
+          <div class="pass-route"><div><small>FROM</small><b>FRONT</b></div><svg viewBox="0 0 64 64" fill="currentColor"><path d="M4 30h40l12-2q6 2 6 4t-6 4l-12-2H4z"/><path d="M30 30L20 8h7l17 22z"/><path d="M30 34L20 56h7l17-22z"/><path d="M8 30L3 18h6l9 12z"/></svg><div><small>TO</small><b>BACK</b></div></div>
+          <div class="pass-grid">
+            <div><small>PASSENGER</small><b id="passName"></b></div><div><small>FLIGHT</small><b>AH 101</b></div>
+            <div><small>GATE</small><b>FOREHEAD <i>(now extra wide)</i></b></div><div><small>SEAT</small><b>21A</b></div>
+            <div><small>CLASS</small><b>SHINY</b></div><div><small>BAGGAGE</small><b>1 CAP (CARRY-ON)</b></div>
+          </div>
+        </div>
+        <div class="pass-stub"><small>BOARDING</small><b>RETREATING</b><small>SEAT</small><b>21A</b><div class="barcode"></div></div>
+      </div>
+      <div class="air-actions reveal-up">
+        <button id="annBtn" data-big>🔊 Play cabin announcement</button>
+        <button id="checkBtn" data-big>Check in online</button>
+        <p class="ann-text" id="annText">Tap a button. The captain is waiting.</p>
+        <p class="fine">*Anand Airlines is not responsible for lost hair. No refunds. No return flights.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- SPLIT -->
   <section id="sides" data-scene="TWO SIDES">
     <div class="eyebrow reveal-up">Two Disciplines</div>
@@ -640,7 +715,7 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
         <g id="lid"><rect x="899" y="584" width="172" height="18" rx="7" fill="#323b2d"/><rect x="965" y="572" width="40" height="14" rx="6" fill="#323b2d"/></g>
       </g>
       <g id="sum" style="transform:translate(-150px,720px)">
-        <g id="sumInner"><g class="bob">
+        <g id="sumFlip"><g id="sumInner"><g class="bob">
           <g class="leg legA"><rect x="-22" y="-122" width="20" height="122" rx="8" fill="#3d352b"/></g>
           <g class="leg legB"><rect x="2" y="-122" width="20" height="122" rx="8" fill="#2f2921"/></g>
           <rect x="-34" y="-238" width="68" height="124" rx="16" fill="#7a869a"/>
@@ -650,8 +725,9 @@ footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;let
           <circle cx="18" cy="-274" r="4" fill="#1d1a17"/>
           <path d="M14 -254 q8 4 14 0" stroke="#1d1a17" stroke-width="3" fill="none"/>
           <g id="censor" class="st"><rect x="8" y="-162" width="130" height="42" fill="#0d0b09"/><text x="73" y="-134" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="17" fill="#efe6d2" letter-spacing="2">CENSORED</text></g>
+          <g id="milk" class="st"><rect x="26" y="-196" width="36" height="48" rx="4" fill="#f4efe3" stroke="#1d1a17" stroke-width="2"/><text x="44" y="-166" text-anchor="middle" font-size="12" font-family="'IM Fell English SC',serif" fill="#1d1a17">MILK</text></g>
           <text id="bang" class="st" x="0" y="-330" text-anchor="middle" font-family="'IM Fell English',serif" font-size="110" fill="#1d1a17">!</text>
-        </g></g>
+        </g></g></g>
         <g id="sTag" class="st"><text x="0" y="-372" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="30" fill="#1d1a17" letter-spacing="3">SUMANTH</text><path d="M0 -360 v28 m-9 -10 l9 10 l9 -10" stroke="#1d1a17" stroke-width="3" fill="none"/></g>
       </g>
       <text id="psss" class="st" x="760" y="640" font-family="'IM Fell English',serif" font-style="italic" font-size="44" fill="#1d1a17">psssssss…</text>
@@ -710,6 +786,8 @@ const CONFIG = {
     { label: "LinkedIn",  url: "https://linkedin.com/" },
   ],
   email: "friend@email.com",
+
+  airlines: true,          // the "Anand Airlines" hairline joke section, set false to remove
 
   stats: [   // "box office" counters
     { n: 50, suffix: "+", label: "Projects edited" },
@@ -856,6 +934,22 @@ const SFX = {
     for (let i = 0; i < total; i++) { const p = i / total, tt = t0 + p * dur + Math.random() * .05, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
       f.type = "bandpass"; f.frequency.value = 1000 + Math.random() * 2000; f.Q.value = 1.5; this.env(g, tt, (.06 + Math.random() * .06) * (1 - p * .8), .002, .05);
       n.connect(f); f.connect(g); g.connect(this.master); n.start(tt, Math.random() * 1.5); n.stop(tt + .08); }
+  },
+  flap() {   // split-flap board click
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "highpass"; f.frequency.value = 2200 + Math.random() * 1500; this.env(g, t, .05, .001, .012); n.connect(f); f.connect(g); g.connect(this.master); n.start(t, Math.random()); n.stop(t + .03);
+  },
+  jet() {   // plane flyby
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "lowpass"; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2400, t + 1.4); f.frequency.exponentialRampToValueAtTime(250, t + 3.2);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t + 1.4); g.gain.exponentialRampToValueAtTime(.0001, t + 3.3);
+    n.connect(f); f.connect(g); g.connect(this.master); n.start(t); n.stop(t + 3.4);
+    const o = c.createOscillator(), og = c.createGain(); o.frequency.setValueAtTime(1500, t); o.frequency.exponentialRampToValueAtTime(900, t + 3);
+    og.gain.setValueAtTime(.0001, t); og.gain.exponentialRampToValueAtTime(.025, t + 1.4); og.gain.exponentialRampToValueAtTime(.0001, t + 3.2); o.connect(og); og.connect(this.master); o.start(t); o.stop(t + 3.3);
+  },
+  dingdong() {   // cabin chime
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    [[880, 0], [698.46, .5]].forEach(([fr, d]) => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = fr; this.env(g, t + d, .25, .01, 1.4); o.connect(g); g.connect(this.master); o.start(t + d); o.stop(t + d + 1.5); });
   },
   footstep() {
     if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
@@ -1019,6 +1113,7 @@ function build() {
   const mq = CONFIG.marquee.map(t => `<span>${esc(t)} ✦</span>`).join(""); $("#marquee").innerHTML = mq + mq;
   $("#stats").innerHTML = CONFIG.stats.map(s => `<div class="stat reveal-up"><b><span data-n="${+s.n}">0</span><em>${esc(s.suffix)}</em></b><small>${esc(s.label)}</small></div>`).join("");
   if (!CONFIG.birthday.enabled) { document.querySelector(".post-credits").style.display = "none"; $("#secret").remove(); }
+  if (!CONFIG.airlines) $("#air").remove(); else buildAirline();
 
   const n = CONFIG.fullName;
   const credits = [["Directed by", n], ["Edited by", n], ["Written by", n], ["Cinematography", n], ["Color & Sound", n]];
@@ -1200,8 +1295,8 @@ async function card(small, text, ms, alive) {
 }
 function resetStory() {
   move("sum", -150, 720); move("baby", 985, 668);
-  E("lid").style.transform = ""; E("sum").classList.remove("walking"); E("binG").classList.remove("rattle");
-  ["sTag", "censor", "bang", "psss", "bubble", "babyTag", "glow", "rays", "puddle"].forEach(id => vis(id, false));
+  E("lid").style.transform = ""; E("sum").classList.remove("walking"); E("binG").classList.remove("rattle"); E("sumFlip").classList.remove("flipped"); vis("milk", false);
+  ["sTag", "censor", "bang", "psss", "bubble", "babyTag", "glow", "rays", "puddle", "milk"].forEach(id => vis(id, false));
   E("intertitle").classList.remove("show");
 }
 async function walk(x, ms, alive) {
@@ -1219,6 +1314,7 @@ async function playSurprise() {
   SFX.init();
   const my = ++token, alive = () => my === token;
   const B = CONFIG.birthday, ov = $("#bday");
+  E("bdaySkip").style.display = "";
   ov.classList.add("open"); document.body.classList.add("locked"); $("#stage").innerHTML = "";
   cleanupStory(); Confetti.stop(); E("finalBg").className = "final-bg";
   SFX.droneTo(.0001, 1);
@@ -1292,18 +1388,40 @@ async function playSurprise() {
   finale(alive);
 }
 
-async function finale(alive) {
+async function finale(alive, opts = {}) {
   const B = CONFIG.birthday, fb = E("finalBg");
+  E("bdaySkip").style.display = "none";
   if (CONFIG.heroImage) fb.style.backgroundImage = `url('${CONFIG.heroImage}')`;
-  flash(); SFX.boom(); fb.classList.add("show"); setTimeout(() => fb.classList.add("color"), 400);
+  if (!opts.quiet) { flash(); SFX.boom(); }
+  fb.classList.add("show"); setTimeout(() => fb.classList.add("color"), 400);
   await scene(`<div class="hb-pre">And now, in colour.</div><div class="hb">HAPPY<br>BIRTHDAY</div><div class="hb-name">${esc(CONFIG.name.toUpperCase())}${B.age ? ` · ${+B.age}` : ""}</div>
     <p class="hb-msg">${esc(B.message)}</p><div class="hb-from">— ${esc(B.from)}</div>
     <div class="bday-actions"><button id="replaySong" data-blip>♪ Play the song again</button><button id="replayAll" data-blip>↻ Replay the film</button><button id="backSite" data-blip>Back to the portfolio</button></div>`, Infinity, alive);
-  Confetti.start(); SFX.applause(5);
-  setTimeout(() => { if (alive()) SFX.happyBirthday(); }, 2200);
+  Confetti.start();
+  if (!opts.quiet) {
+    SFX.applause(5);
+    setTimeout(() => { if (alive()) SFX.happyBirthday(); }, 2200);
+    setTimeout(() => { if (alive()) epilogue(alive); }, 17500);   // ...but the film isn't over
+  }
   $("#replaySong").onclick = () => SFX.happyBirthday();
   $("#replayAll").onclick = () => { Confetti.stop(); SFX.rewind(); setTimeout(playSurprise, 700); };
   $("#backSite").onclick = closeSurprise;
+}
+async function epilogue(alive) {
+  Confetti.stop(); $("#stage").innerHTML = ""; E("finalBg").className = "final-bg";
+  resetStory(); E("silent").classList.add("on"); SFX.startPiano(); SFX.startProjector();
+  await card("EPILOGUE", `${+CONFIG.birthday.age || 21} years later.`, 2600, alive);
+  await card("", "Sumanth went back to the kirana store.<br><em>He had unfinished business.</em>", 3400, alive); if (!alive()) return;
+  vis("sTag"); await walk(1235, 5200, alive); if (!alive()) return; vis("sTag", false);
+  await card("SUMANTH", "“One packet of milk, please.”", 2700, alive);
+  await card("THE SHOPKEEPER", "“Sir… you ordered this twenty-one years ago.<br>It has expired.<br><em>That’ll be ₹21.</em>”", 4600, alive); if (!alive()) return;
+  vis("milk"); E("sumFlip").classList.add("flipped"); SFX.boing(); await sleep(500);
+  await walk(700, 3000, alive); if (!alive()) return;
+  await card("", "Sumanth finally got the milk.", 2800, alive);
+  await card("", "THE END<br><em>(for real this time)</em>", 3000, alive); if (!alive()) return;
+  SFX.stopPiano(); SFX.stopProjector(); E("silent").classList.remove("on");
+  await sleep(700); if (!alive()) return;
+  finale(alive, { quiet: true });
 }
 function skipToEnd() {
   const my = ++token, alive = () => my === token;
@@ -1328,6 +1446,65 @@ $("#reelPill").addEventListener("click", e => {
 new IntersectionObserver(es => { if (es[0].isIntersecting) hidePill(); }, { threshold: .3 }).observe($("#secret"));
 $("#bdayClose").addEventListener("click", closeSurprise);
 $("#bdaySkip").addEventListener("click", skipToEnd);
+
+/* ---------------- anand airlines ---------------- */
+const AIR_ROWS = [
+  ["AH101", "FOREHEAD", "DEPARTED", "st-green"],
+  ["AH102", "TEMPLES", "NOW BOARDING", "st-amber"],
+  ["AH103", "CROWN", "FINAL CALL", "st-amber"],
+  ["AH104", "BACK OF HEAD", "ON TIME", "st-green"],
+  ["AH105", "FRONT ROW", "CANCELLED", "st-red"],
+  ["AH106", "COMB CITY", "NOT SERVED", "st-red"],
+];
+function buildAirline() {
+  const pad = (t, n) => t.padEnd(n, " ").slice(0, n);
+  const tiles = (t, n) => [...pad(t, n)].map(c => `<span class="fl" data-c="${c === " " ? "" : esc(c)}"></span>`).join("");
+  $("#boardRows").innerHTML = AIR_ROWS.map(([f, d, st, cls]) =>
+    `<div class="board-row"><span class="cell">${tiles(f, 6)}</span><span class="cell">${tiles(d, 12)}</span><span class="cell ${cls}">${tiles(st, 12)}</span></div>`).join("");
+  $("#passName").textContent = CONFIG.fullName.toUpperCase();
+  const clock = () => { const d = new Date(); $("#boardClock").textContent = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  clock(); setInterval(clock, 20000);
+  const obs = new IntersectionObserver(es => {
+    if (!es[0].isIntersecting || !introDone) return; obs.disconnect();
+    $("#air").classList.add("fly"); SFX.jet(); setTimeout(() => SFX.dingdong(), 900); flapBoard();
+  }, { threshold: .25 });
+  obs.observe($("#air"));
+  $("#annBtn").addEventListener("click", announce);
+  $("#checkBtn").addEventListener("click", () => {
+    SFX.init(); SFX.beep(160, .3, .15); setTimeout(() => SFX.beep(120, .35, .15), 180);
+    $("#annText").textContent = "Check-in closed. The hairline left without you.";
+    const b = $("#checkBtn"); b.classList.remove("denied"); void b.offsetWidth; b.classList.add("denied");
+  });
+}
+function flapBoard() {
+  const CH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", tiles = [...document.querySelectorAll("#boardRows .fl")], t0 = performance.now(); let last = 0;
+  tiles.forEach((el, i) => { el.dataset.at = 400 + i * 16 + Math.random() * 350; el.dataset.done = ""; });
+  (function f(now) {
+    let pending = 0;
+    tiles.forEach(el => {
+      if (el.dataset.done) return;
+      if (now - t0 >= +el.dataset.at) { el.textContent = el.dataset.c; el.dataset.done = "1"; }
+      else { pending++; el.textContent = CH[Math.random() * CH.length | 0]; }
+    });
+    if (pending && now - last > 32) { SFX.flap(); last = now; }
+    if (pending) requestAnimationFrame(f);
+  })(t0);
+}
+let announcing = false;
+async function announce() {
+  if (announcing) return; announcing = true; SFX.init(); SFX.dingdong();
+  const txt = "Ladies and gentlemen, this is your captain speaking. The hairline has begun its retreat. Please keep your caps on until it comes to a complete stop. Thank you for flying Anand Airlines.";
+  const el = $("#annText"); el.textContent = ""; await sleep(1300);
+  try {
+    if (SFX.on && "speechSynthesis" in window) {
+      speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt), vs = speechSynthesis.getVoices();
+      u.rate = .95; u.pitch = .85; u.voice = vs.find(v => /en-IN/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+      speechSynthesis.speak(u);
+    }
+  } catch (e) {}
+  for (let i = 0; i <= txt.length; i++) { el.textContent = "“" + txt.slice(0, i) + (i < txt.length ? "▌" : "”"); await sleep(42); }
+  announcing = false;
+}
 
 /* ---------------- clapperboard ---------------- */
 let take = 1;
