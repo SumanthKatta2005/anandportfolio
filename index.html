@@ -722,7 +722,8 @@ const CONFIG = {
   /* ---------- 🎂 the post-credits birthday surprise ---------- */
   birthday: {
     enabled: true,            // set to false to remove the surprise after the birthday
-    from: "Sumanth, Harsha & Prasangi",
+    from: "Sumanth, Harsha, Shashi & Prasangi",
+    age: 21,                  // shows in the story and the finale
     presents: "Your crew presents",
     photos: [   // "Behind the Scenes" montage, popped out of an instant camera
       { src: "cake.jpg",        caption: "Cake 1 — Anand 0" },
@@ -1229,7 +1230,7 @@ async function playSurprise() {
   resetStory(); E("silent").classList.add("on"); SFX.startPiano();
   await card("A SILENT PICTURE", `${esc(B.from)}<br><em>present</em>`, 2800, alive);
   await card("", `<em>The Origin of</em><span class="big">${esc(CONFIG.name.toUpperCase())}</span>`, 3200, alive);
-  await card("CHAPTER ONE", "Hyderabad.<br>A long, long time ago.", 2800, alive);
+  await card("CHAPTER ONE", B.age ? `Hyderabad.<br>${+B.age} years ago.` : "Hyderabad.<br>A long, long time ago.", 2800, alive);
   await card("", "Young Sumanth was sent to the kirana store<br>to buy <em>one packet of milk.</em>", 3800, alive); if (!alive()) return;
 
   vis("sTag"); await walk(590, 4000, alive); if (!alive()) return;
@@ -1295,7 +1296,7 @@ async function finale(alive) {
   const B = CONFIG.birthday, fb = E("finalBg");
   if (CONFIG.heroImage) fb.style.backgroundImage = `url('${CONFIG.heroImage}')`;
   flash(); SFX.boom(); fb.classList.add("show"); setTimeout(() => fb.classList.add("color"), 400);
-  await scene(`<div class="hb-pre">And now, in colour.</div><div class="hb">HAPPY<br>BIRTHDAY</div><div class="hb-name">${esc(CONFIG.name.toUpperCase())}</div>
+  await scene(`<div class="hb-pre">And now, in colour.</div><div class="hb">HAPPY<br>BIRTHDAY</div><div class="hb-name">${esc(CONFIG.name.toUpperCase())}${B.age ? ` · ${+B.age}` : ""}</div>
     <p class="hb-msg">${esc(B.message)}</p><div class="hb-from">— ${esc(B.from)}</div>
     <div class="bday-actions"><button id="replaySong" data-blip>♪ Play the song again</button><button id="replayAll" data-blip>↻ Replay the film</button><button id="backSite" data-blip>Back to the portfolio</button></div>`, Infinity, alive);
   Confetti.start(); SFX.applause(5);
