@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anand Kumar Eluri — Editor · Filmmaker · Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Inter:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0a09; --ink:#f3ece0; --dim:#8a8178; --amber:#ffb547; --red:#ff3b30; --line:rgba(243,236,224,.12);
+  --display:'Bebas Neue',Impact,sans-serif; --body:'Inter',system-ui,sans-serif; --mono:'Space Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--amber);color:#000}
+
+/* ---------- film texture ---------- */
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:90;opacity:.09;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .5s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:89;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65) 100%)}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;z-index:80;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;pointer-events:none}
+.hud.tl{top:18px;left:22px}.hud.tr{top:18px;right:22px}.hud.bl{bottom:18px;left:22px}.hud.br{bottom:14px;right:18px;pointer-events:auto}
+.rec{color:var(--ink)}.rec i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.15}}
+.sound-btn{background:none;border:1px solid var(--line);color:var(--ink);font:inherit;letter-spacing:.12em;padding:8px 12px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.sound-btn:hover{border-color:var(--amber);color:var(--amber)}
+.bars{display:flex;gap:2px;align-items:flex-end;height:10px}
+.bars span{width:2px;background:currentColor;animation:eq .8s infinite ease-in-out}
+.bars span:nth-child(2){animation-delay:.2s}.bars span:nth-child(3){animation-delay:.4s}.bars span:nth-child(4){animation-delay:.1s}
+.muted .bars span{animation:none;height:2px}
+@keyframes eq{0%,100%{height:2px}50%{height:10px}}
+
+/* ---------- cursor ---------- */
+.cursor{position:fixed;top:0;left:0;width:34px;height:34px;pointer-events:none;z-index:200;transform:translate(-50%,-50%);transition:width .25s,height .25s;mix-blend-mode:difference}
+.cursor::before,.cursor::after,.cursor b::before,.cursor b::after{content:"";position:absolute;width:9px;height:9px;border-color:#fff;border-style:solid}
+.cursor::before{top:0;left:0;border-width:1.5px 0 0 1.5px}.cursor::after{top:0;right:0;border-width:1.5px 1.5px 0 0}
+.cursor b::before{bottom:0;left:0;border-width:0 0 1.5px 1.5px}.cursor b::after{bottom:0;right:0;border-width:0 1.5px 1.5px 0}
+.cursor i{position:absolute;top:50%;left:50%;width:3px;height:3px;background:var(--red);border-radius:50%;transform:translate(-50%,-50%)}
+.cursor.big{width:64px;height:64px}
+@media (hover:none){.cursor{display:none}}
+@media (hover:hover){body,a,button{cursor:none}}
+
+/* ---------- intro gate ---------- */
+.gate{position:fixed;inset:0;z-index:150;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;transition:opacity 1.2s}
+.gate.gone{opacity:0;pointer-events:none}
+.gate small{font-family:var(--mono);color:var(--dim);letter-spacing:.35em;font-size:11px;text-transform:uppercase}
+.gate-btn{font-family:var(--display);font-size:clamp(28px,5vw,44px);letter-spacing:.12em;background:none;color:var(--ink);border:1px solid var(--ink);padding:16px 40px;position:relative;overflow:hidden;transition:color .3s}
+.gate-btn::before{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.7,0,.2,1);z-index:-1}
+.gate-btn:hover{color:#000}.gate-btn:hover::before{transform:scaleX(1)}
+.gate .skip{font-family:var(--mono);font-size:11px;color:var(--dim);background:none;border:none;letter-spacing:.2em;text-transform:uppercase}
+.gate .skip:hover{color:var(--ink)}
+.leader{position:absolute;inset:0;width:100%;height:100%;display:none}
+.flash{position:fixed;inset:0;background:#fff;z-index:160;opacity:0;pointer-events:none}
+.flash.go{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+
+/* ---------- layout ---------- */
+section{position:relative;padding:140px 7vw}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--amber);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:14px}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--amber)}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(52px,9vw,128px);line-height:.9;letter-spacing:.01em}
+.reveal-up{opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+.reveal-up.in{opacity:1;transform:none}
+
+/* ---------- hero ---------- */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-top:90px}
+.letterbox{position:absolute;left:0;right:0;height:9vh;background:#000;z-index:3;transition:height 1.6s cubic-bezier(.7,0,.2,1)}
+.letterbox.t{top:0}.letterbox.b{bottom:0}
+.hero.opened .letterbox{height:5vh}
+.leak{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;mix-blend-mode:screen;animation:drift 18s ease-in-out infinite alternate}
+.leak.a{width:55vw;height:55vw;background:#ff6a00;top:-20%;right:-15%}
+.leak.b{width:40vw;height:40vw;background:#ff2d55;bottom:-25%;left:-10%;animation-duration:24s;opacity:.22}
+.leak.c{width:30vw;height:30vw;background:#ffd36b;top:30%;left:40%;animation-duration:30s;opacity:.15}
+@keyframes drift{to{transform:translate(-8vw,6vh) scale(1.15)}}
+.flare{position:absolute;top:50%;left:-10%;width:120%;height:2px;background:linear-gradient(90deg,transparent,rgba(120,180,255,.0) 20%,rgba(140,200,255,.8) 50%,rgba(120,180,255,0) 80%,transparent);filter:blur(1px);opacity:0;z-index:1}
+.hero.opened .flare{animation:flare 2.4s ease-out .3s}
+@keyframes flare{0%{opacity:0;transform:scaleX(.2)}30%{opacity:1}100%{opacity:0;transform:scaleX(1.2)}}
+.hero-inner{position:relative;z-index:2}
+.presents{font-family:var(--mono);font-size:12px;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;opacity:0;transition:opacity 1.5s .2s}
+.hero.opened .presents{opacity:1}
+.name{font-family:var(--display);font-size:clamp(90px,21vw,300px);line-height:.82;letter-spacing:.02em;margin:18px 0 10px;white-space:nowrap}
+.name span{display:inline-block;opacity:0;filter:blur(18px);transform:scale(1.4);transition:opacity 1.2s,filter 1.2s,transform 1.6s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i)*90ms + .4s)}
+.hero.opened .name span{opacity:1;filter:blur(0);transform:none}
+.roles{font-family:var(--mono);font-size:clamp(13px,1.6vw,18px);letter-spacing:.2em;text-transform:uppercase;min-height:1.6em;opacity:0;transition:opacity 1s 1.6s}
+.hero.opened .roles{opacity:1}
+.roles .typed{color:var(--amber)}
+.roles .caret{display:inline-block;width:.6em;height:1.1em;background:var(--amber);vertical-align:-3px;margin-left:4px;animation:blink 1s steps(1) infinite}
+.tagline{max-width:520px;color:var(--dim);margin-top:28px;line-height:1.7;font-size:15px;opacity:0;transition:opacity 1s 2s}
+.hero.opened .tagline{opacity:1}
+.scroll-cue{position:absolute;bottom:9vh;left:7vw;z-index:4;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--dim);display:flex;align-items:center;gap:12px}
+.scroll-cue::after{content:"";width:60px;height:1px;background:var(--dim);transform-origin:left;animation:cue 2s infinite}
+@keyframes cue{0%{transform:scaleX(0)}50%{transform:scaleX(1)}100%{transform:scaleX(1);opacity:0}}
+
+.hero-photo{position:absolute;top:0;bottom:0;left:36%;right:0;background:#000 center 62%/cover no-repeat;opacity:0;transform:scale(1.12);transition:opacity 2.5s ease .2s,transform 9s cubic-bezier(.2,.7,.2,1)}
+.hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 0%,rgba(11,10,9,.55) 22%,transparent 50%,rgba(11,10,9,.3)),linear-gradient(0deg,var(--bg) 2%,transparent 40%),linear-gradient(180deg,rgba(11,10,9,.5),transparent 25%)}
+@media (max-width:800px){.hero-photo{left:0;opacity:.45!important}}
+.hero.opened .hero-photo{opacity:1;transform:scale(1)}
+.about-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:6vw;align-items:center;margin-top:30px}
+.about-grid .about-text{margin-top:0;font-size:clamp(32px,4.4vw,64px)}
+.about-photo{position:relative;border:1px solid var(--line);padding:10px;background:#0f0e0d}
+.about-photo img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;filter:grayscale(.35) contrast(1.05);transition:filter .8s}
+.about-photo:hover img{filter:none}
+.about-photo figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;padding-top:10px;display:flex;justify-content:space-between}
+.about-photo figcaption::after{content:"● REC";color:var(--red)}
+@media (max-width:800px){.about-grid{grid-template-columns:1fr}}
+
+/* ---------- showreel ---------- */
+.reel-frame{position:relative;aspect-ratio:2.39/1;margin-top:50px;overflow:hidden;border:1px solid var(--line);display:block;background:#111}
+.reel-bg{position:absolute;inset:-10%;background:radial-gradient(circle at 30% 40%,#3b1d0b,transparent 60%),radial-gradient(circle at 75% 65%,#0b2a3b,transparent 55%),#0d0c0b;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.reel-frame:hover .reel-bg{transform:scale(1.06)}
+.reel-frame .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 3px)}
+.play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:50%;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;transition:transform .5s,background .3s}
+.play::before{content:"";border-left:22px solid var(--ink);border-top:14px solid transparent;border-bottom:14px solid transparent;margin-left:6px;transition:border-color .3s}
+.reel-frame:hover .play{transform:translate(-50%,-50%) scale(1.15);background:var(--ink)}
+.reel-frame:hover .play::before{border-left-color:#000}
+.play::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(243,236,224,.3);animation:ring 2.4s infinite}
+@keyframes ring{0%{transform:scale(.85);opacity:1}100%{transform:scale(1.35);opacity:0}}
+.frame-meta{position:absolute;font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase}
+.frame-meta.l{left:18px;bottom:14px}.frame-meta.r{right:18px;bottom:14px}.frame-meta.t{left:18px;top:14px;color:var(--red)}
+.corner{position:absolute;width:22px;height:22px;border-color:var(--ink);border-style:solid;opacity:.6}
+.corner.a{top:14px;right:14px;border-width:1px 1px 0 0}.corner.b{bottom:44px;left:14px;border-width:0 0 1px 1px}
+
+/* ---------- work ---------- */
+.work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:28px;margin-top:60px;perspective:1200px}
+.card{position:relative;display:block;transform-style:preserve-3d;transition:transform .2s ease-out}
+.thumb{position:relative;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line)}
+.thumb .bg{position:absolute;inset:0;transition:transform 1s cubic-bezier(.2,.7,.2,1),filter .6s;filter:saturate(.7) brightness(.8)}
+.card:hover .thumb .bg{transform:scale(1.08);filter:saturate(1.1) brightness(1)}
+.thumb .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px);opacity:0;transition:opacity .4s}
+.card:hover .thumb .scan{opacity:1}
+.thumb .tc{position:absolute;top:12px;left:12px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;background:rgba(0,0,0,.55);padding:4px 7px}
+.thumb .mini-play{position:absolute;bottom:12px;right:12px;width:42px;height:42px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.thumb .mini-play::before{content:"";border-left:11px solid #000;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.card:hover .mini-play{transform:scale(1)}
+.thumb .big-num{position:absolute;right:14px;top:4px;font-family:var(--display);font-size:72px;color:rgba(255,255,255,.12);line-height:1}
+.card-info{display:flex;justify-content:space-between;align-items:baseline;padding:16px 2px 0}
+.card-info h3{font-family:var(--display);font-weight:400;font-size:30px;letter-spacing:.03em}
+.card-info span{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+
+.filters{display:flex;gap:10px;margin-top:40px;flex-wrap:wrap}
+.filters button{font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;background:none;color:var(--dim);border:1px solid var(--line);padding:10px 18px;transition:all .3s}
+.filters button:hover{color:var(--ink);border-color:var(--ink)}
+.filters button.on{background:var(--ink);color:#000;border-color:var(--ink)}
+.card.hide{display:none}
+.card .cat{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:4px 7px;background:var(--amber);color:#000;text-transform:uppercase}
+.card .cat.tech{background:#5fe0a0}
+
+/* ---------- timeline ---------- */
+.timeline{margin-top:60px;border:1px solid var(--line);background:#0f0e0d;font-family:var(--mono);font-size:12px;position:relative;overflow:hidden}
+.ruler{display:flex;height:30px;border-bottom:1px solid var(--line);padding-left:110px;color:var(--dim);font-size:10px}
+.ruler span{flex:1;border-left:1px solid var(--line);padding:9px 6px}
+.track{display:flex;height:64px;border-bottom:1px solid var(--line)}
+.track:last-child{border-bottom:none}
+.track-head{width:110px;flex:none;display:flex;flex-direction:column;justify-content:center;padding-left:16px;border-right:1px solid var(--line);color:var(--dim)}
+.track-head b{color:var(--ink);font-weight:700;letter-spacing:.1em}
+.track-lane{flex:1;position:relative;display:flex;align-items:center;gap:4px;padding:0 6px}
+.clip{height:46px;border-radius:3px;padding:8px 10px;display:flex;align-items:flex-end;font-size:11px;white-space:nowrap;overflow:hidden;color:#0b0a09;font-weight:700;letter-spacing:.04em;transform:translateX(120vw);transition:transform 1s cubic-bezier(.2,.8,.2,1);position:relative}
+.clip::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 2px,transparent 2px 14px)}
+.timeline.in .clip{transform:none}
+.track.v1 .clip{background:#7aa7ff}.track.v2 .clip{background:#c98bff}.track.a1 .clip{background:#5fe0a0}
+.track.a1 .clip::after{content:"";position:absolute;left:8px;right:8px;top:8px;height:18px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.35) 0 2px,transparent 2px 4px);clip-path:polygon(0 50%,4% 20%,8% 70%,12% 35%,16% 80%,20% 10%,24% 60%,28% 30%,32% 75%,36% 40%,40% 90%,44% 15%,48% 55%,52% 25%,56% 85%,60% 45%,64% 20%,68% 70%,72% 35%,76% 65%,80% 10%,84% 55%,88% 30%,92% 80%,96% 40%,100% 50%,100% 100%,0 100%)}
+.playhead{position:absolute;top:0;bottom:0;left:110px;width:2px;background:var(--red);z-index:2;box-shadow:0 0 12px var(--red)}
+.playhead::before{content:"";position:absolute;top:0;left:-6px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--red)}
+.timeline.in .playhead{animation:sweep 7s linear infinite 1s}
+@keyframes sweep{from{left:110px}to{left:100%}}
+
+/* ---------- split ---------- */
+.split{position:relative;height:80vh;min-height:520px;margin-top:60px;border:1px solid var(--line);overflow:hidden}
+.pane{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6vw}
+.pane.code{background:#07110c;color:#5fe0a0}
+.pane.film{background:#140b06;color:var(--ink);clip-path:inset(0 0 0 50%);transition:clip-path .08s linear}
+.pane h3{font-family:var(--display);font-weight:400;font-size:clamp(60px,10vw,150px);line-height:.85}
+.pane.code h3{font-family:var(--mono);font-weight:700;font-size:clamp(38px,6vw,90px);letter-spacing:-.02em}
+.pane p{max-width:420px;margin-top:20px;line-height:1.7;opacity:.75}
+.pane pre{font-family:var(--mono);font-size:13px;margin-top:28px;line-height:1.8;opacity:.85;white-space:pre-wrap}
+.pane.film{align-items:flex-end;text-align:right}
+.pane.film p{margin-left:auto}
+.filmstrip{position:absolute;left:0;right:0;bottom:0;height:70px;background:#000;display:flex;gap:10px;padding:14px 0;overflow:hidden}
+.filmstrip::before,.filmstrip::after{content:"";position:absolute;left:0;right:0;height:6px;background:repeating-linear-gradient(90deg,transparent 0 8px,#2a2420 8px 18px)}
+.filmstrip::before{top:4px}.filmstrip::after{bottom:4px}
+.filmstrip .strip{display:flex;gap:8px;animation:strip 14s linear infinite}
+.filmstrip .strip div{width:70px;height:42px;flex:none;border-radius:2px}
+@keyframes strip{to{transform:translateX(-50%)}}
+.divider{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--amber);z-index:3;transition:left .08s linear;pointer-events:none}
+.divider::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:var(--amber);color:#000;display:flex;align-items:center;justify-content:center;font-size:18px}
+.build{position:absolute;left:6vw;bottom:5vh;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#3f9e6f}
+.build b{color:#5fe0a0}
+.big-reel{position:absolute;top:6vh;right:6vw;width:min(150px,18vw);color:var(--amber);opacity:.85}
+.reel-count{position:absolute;top:calc(6vh + min(150px,18vw) + 14px);right:6vw;font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--amber)}
+.split-hint{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-top:16px}
+
+/* ---------- about ---------- */
+.about-text{font-family:var(--display);font-size:clamp(38px,6vw,86px);line-height:1.02;max-width:1200px;margin-top:30px}
+.about-text span{opacity:.12;transition:opacity .3s}
+.about-text span.lit{opacity:1}
+.about-text span.hl.lit{color:var(--amber)}
+
+/* ---------- contact ---------- */
+.contact{text-align:center;padding-top:180px;padding-bottom:180px}
+.contact h2{font-size:clamp(60px,13vw,200px)}
+.contact h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.5px var(--ink)}
+.socials{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:50px}
+.socials a{font-family:var(--mono);font-size:13px;letter-spacing:.12em;border:1px solid var(--line);padding:14px 22px;text-transform:uppercase;transition:all .3s;position:relative;overflow:hidden}
+.socials a:hover{border-color:var(--amber);color:#000;background:var(--amber)}
+.email-text{margin-top:24px;font-family:var(--mono);color:var(--dim);font-size:13px}
+
+/* ---------- secret reel ---------- */
+.secret{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 50% 42%,#2b1a07 0,#0b0a09 62%);overflow:hidden}
+.secret h2{margin-top:26px}
+.beam{position:absolute;top:-10%;width:30vw;height:130%;background:linear-gradient(180deg,rgba(255,200,110,.13),transparent 75%);filter:blur(10px);transform-origin:50% 0;pointer-events:none}
+.beam.a{left:18%;animation:sweep1 7s ease-in-out infinite alternate}.beam.b{right:18%;animation:sweep1 9s ease-in-out infinite alternate-reverse}
+@keyframes sweep1{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.can-wrap{position:relative;width:min(290px,62vw);aspect-ratio:1;margin-top:6px}
+.can{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#0d0b09 0 14%,#3d362e 14.5% 17%,transparent 17.5%),repeating-conic-gradient(#3a342d 0 3deg,#26221e 3deg 6deg);box-shadow:inset 0 0 0 12px #1a1714,inset 0 0 0 16px #4a4238,0 30px 80px rgba(0,0,0,.8),0 0 140px rgba(255,181,71,.18);animation:canspin 26s linear infinite}
+.secret:hover .can{animation-duration:4s}
+@keyframes canspin{to{transform:rotate(360deg)}}
+.can-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-5deg);background:#efe6d2;color:#141210;padding:14px 22px 16px;min-width:72%;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.can-label small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.3em;opacity:.6}
+.can-label b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(28px,4vw,40px);letter-spacing:.04em;line-height:1;margin-top:4px}
+.can-label i{position:absolute;right:-14px;bottom:-16px;font-style:normal;font-family:var(--display);font-size:20px;letter-spacing:.12em;color:var(--red);border:2px solid var(--red);padding:0 8px;transform:rotate(9deg);background:rgba(239,230,210,.9)}
+.secret-sub{color:var(--dim);margin-top:16px;font-size:16px}.secret-sub b{color:var(--amber)}
+.secret-btn{margin-top:34px;font-family:var(--display);font-size:clamp(26px,3.4vw,38px);letter-spacing:.1em;background:var(--amber);color:#141210;border:none;padding:18px 40px;animation:pulse 2s infinite;transition:transform .2s}
+.secret-btn:hover{transform:scale(1.05)}
+.reel-pill{position:fixed;left:50%;bottom:22px;transform:translate(-50%,160%);z-index:86;display:flex;align-items:center;gap:10px;background:#efe6d2;color:#141210;border:none;border-radius:40px;padding:10px 14px 10px 16px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;box-shadow:0 12px 40px rgba(0,0,0,.6);transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
+.reel-pill.show{transform:translate(-50%,0)}
+.reel-pill svg{width:20px;height:20px;animation:canspin 3s linear infinite}
+.reel-pill b{color:#c0392b}
+.reel-pill em{font-style:normal;margin-left:6px;opacity:.5;padding:2px 4px}.reel-pill em:hover{opacity:1}
+@media (max-width:700px){.reel-pill span{font-size:11px}.hud.br{bottom:70px}}
+
+/* ---------- end credits ---------- */
+.credits{height:100vh;overflow:hidden;padding:0;display:flex;justify-content:center;background:#000;-webkit-mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent)}
+.credits-roll{text-align:center;transform:translateY(100vh);padding-bottom:20vh}
+.credits.in .credits-roll{animation:roll 22s linear forwards}
+@keyframes roll{to{transform:translateY(calc(-100% + 60vh))}}
+.credit{margin:30px 0}
+.credit small{display:block;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;margin-bottom:6px}
+.credit b{font-family:var(--display);font-weight:400;font-size:34px;letter-spacing:.06em}
+.the-end{font-family:var(--display);font-size:clamp(70px,12vw,160px);margin-top:16vh}
+.post-credits{padding:80px 7vw 160px;text-align:center;background:#000}
+.pc-btn{font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;background:none;color:var(--amber);border:1px dashed var(--amber);padding:18px 30px;opacity:0;transform:translateY(20px);transition:all 1s;animation:pulse 2s infinite}
+.pc-btn.show{opacity:1;transform:none}
+.pc-btn:hover{background:var(--amber);color:#000}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,181,71,.35)}50%{box-shadow:0 0 0 14px rgba(255,181,71,0)}}
+.post-credits p{font-family:var(--mono);font-size:11px;color:#4a443e;letter-spacing:.2em;margin-top:22px;text-transform:uppercase}
+footer{padding:30px 7vw;font-family:var(--mono);font-size:11px;color:#4a443e;letter-spacing:.15em;text-transform:uppercase;display:flex;justify-content:space-between;background:#000;flex-wrap:wrap;gap:10px}
+
+/* ---------- reel icon ---------- */
+.hud.bl{display:flex;align-items:center}
+.reel-icon{width:22px;height:22px;margin-right:10px;color:var(--ink);flex:none}
+
+/* ---------- clapperboard ---------- */
+.clap-sec{padding:130px 7vw 20px;overflow:hidden;display:flex;justify-content:center}
+.clapper{width:min(560px,90vw);position:relative;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
+.clap-stick{height:50px;background:repeating-linear-gradient(-55deg,#f3ece0 0 28px,#111 28px 56px);border-radius:4px 4px 0 0;transform-origin:3% 100%;transform:rotate(-26deg);transition:transform .18s cubic-bezier(.6,0,1,.6)}
+.clapper.snap .clap-stick{transform:rotate(0)}
+.clap-hinge{height:36px;background:repeating-linear-gradient(55deg,#f3ece0 0 28px,#111 28px 56px);margin-top:3px}
+.clap-board{background:#141210;border:2px solid #f3ece0;border-top:none;padding:18px 22px;font-family:var(--mono);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 18px;text-transform:uppercase}
+.clap-board div{border-bottom:1px solid rgba(243,236,224,.25);padding-bottom:6px}
+.clap-board small{display:block;font-size:9px;color:var(--dim);letter-spacing:.2em}
+.clap-board b{font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:.05em}
+.clap-board .wide{grid-column:1/-1}
+.clap-hint{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.2em;text-align:center;margin-top:14px;text-transform:uppercase}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-1px)}80%{transform:translate(2px,1px)}}
+
+/* ---------- marquee ---------- */
+.marquee{position:relative;background:#120d08;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:30px 0;overflow:hidden}
+.marquee::before,.marquee::after{content:"";position:absolute;left:0;right:0;height:8px;background:radial-gradient(circle,#ffd36b 0 2.5px,transparent 3px) 0 0/22px 8px;animation:bulbs 1s steps(2) infinite}
+.marquee::before{top:6px}.marquee::after{bottom:6px;animation-delay:.5s}
+@keyframes bulbs{50%{opacity:.25}}
+.marquee-track{display:flex;width:max-content;animation:mq 30s linear infinite}
+.marquee-track span{font-family:var(--display);font-size:clamp(36px,6vw,72px);letter-spacing:.06em;padding:0 28px;white-space:nowrap}
+.marquee-track span:nth-child(even){color:transparent;-webkit-text-stroke:1px var(--amber)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:60px}
+.stat{background:var(--bg);padding:40px 28px}
+.stat b{font-family:var(--display);font-weight:400;font-size:clamp(60px,7vw,96px);line-height:1}
+.stat b em{font-style:normal;color:var(--amber);font-size:.5em;margin-left:4px}
+.stat small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-top:10px}
+
+/* ---------- locked cards ---------- */
+.card.locked .thumb .bg{filter:blur(8px) saturate(.4) brightness(.45)!important}
+.stamp{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) rotate(-10deg);border:3px solid var(--red);color:var(--red);font-family:var(--display);font-size:38px;letter-spacing:.14em;padding:2px 16px;opacity:.9}
+.lock-note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.25em;color:var(--dim);text-transform:uppercase}
+.card.locked:hover .thumb{animation:shake .35s}
+
+/* ---------- ticket ---------- */
+.ticket{display:flex;max-width:760px;margin:50px auto 0;text-align:left;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
+.t-main{flex:1;background:var(--ink);color:#141210;padding:28px 32px;border-radius:10px 0 0 10px}
+.t-main small{font-family:var(--mono);font-size:10px;letter-spacing:.3em;display:block;opacity:.6}
+.t-main h4{font-family:var(--display);font-weight:400;font-size:clamp(36px,5vw,56px);line-height:.95;margin:8px 0 18px}
+.t-row{display:flex;gap:26px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;flex-wrap:wrap}
+.t-row b{display:block;font-size:16px}
+.t-stub{width:200px;background:var(--amber);color:#141210;border-radius:0 10px 10px 0;border-left:2px dashed #141210;padding:22px 18px;display:flex;flex-direction:column;justify-content:center;gap:4px;position:relative;transition:transform .4s cubic-bezier(.3,1.5,.5,1);transform-origin:left bottom}
+.t-stub:hover{transform:rotate(5deg) translateX(8px)}
+.t-stub::before,.t-stub::after{content:"";position:absolute;left:-13px;width:24px;height:24px;border-radius:50%;background:var(--bg)}
+.t-stub::before{top:-12px}.t-stub::after{bottom:-12px}
+.t-stub a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid rgba(0,0,0,.25);padding:8px 0;transition:padding .2s}
+.t-stub a:hover{padding-left:8px}
+@media (max-width:700px){.ticket{flex-direction:column}.t-main{border-radius:10px 10px 0 0}.t-stub{width:auto;border-left:none;border-top:2px dashed #141210;border-radius:0 0 10px 10px}.t-stub::before,.t-stub::after{display:none}}
+
+/* ---------- bloopers polaroids ---------- */
+.bloopers-title{position:absolute;top:calc(11vh + 26px);left:0;right:0;text-align:center;font-family:var(--mono);letter-spacing:.45em;font-size:13px;color:var(--amber);z-index:6}
+.polaroid{position:absolute;top:48%;left:50%;width:min(270px,56vw);background:#f6f1e7;padding:12px 12px 52px;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:translate(-50%,-50%) translateY(calc(41vh - 150px)) scale(.16);opacity:0;transition:transform 1s cubic-bezier(.2,.9,.25,1.05),opacity .15s;z-index:3}
+.polaroid.eject{opacity:1;transform:translate(-50%,-50%) translateY(calc(41vh - 215px)) scale(.2)}
+.polaroid.in{opacity:1;transform:translate(-50%,-50%) translate(var(--x),var(--y)) rotate(var(--r))}
+.polaroid.gone{opacity:1;transform:translate(-50%,-50%) translate(var(--x),-140vh) rotate(calc(var(--r) * 3));transition:transform 1.1s cubic-bezier(.6,0,.8,.4)}
+.camera{position:absolute;left:50%;bottom:calc(11vh + 12px);width:200px;height:132px;transform:translate(-50%,170%);transition:transform .8s cubic-bezier(.2,.9,.3,1.15);z-index:4}
+.camera.in{transform:translate(-50%,0)}
+.cam-body{position:absolute;inset:0;background:linear-gradient(#f1ebde,#d6cdbb);border-radius:18px;box-shadow:0 24px 50px rgba(0,0,0,.7),inset 0 -6px 0 rgba(0,0,0,.08)}
+.cam-btn{position:absolute;top:-7px;left:26px;width:26px;height:10px;background:var(--red);border-radius:5px 5px 0 0}
+.cam-slot{position:absolute;top:12px;left:34px;right:34px;height:6px;background:#2a2622;border-radius:3px}
+.cam-stripe{position:absolute;left:16px;top:36px;width:46px;height:5px;background:var(--amber);border-radius:2px}
+.cam-flash{position:absolute;top:28px;right:18px;width:40px;height:24px;background:linear-gradient(#fff,#cfd6dc);border-radius:4px;border:2px solid #2a2622}
+.cam-flash.fire{animation:camflash .55s ease-out}
+@keyframes camflash{0%{background:#fff;box-shadow:0 0 0 0 #fff}15%{box-shadow:0 0 160px 90px rgba(255,255,255,.9)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.cam-lens{position:absolute;left:50%;top:60%;width:78px;height:78px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 38% 34%,#7d8ea4 0 7%,#141414 20%,#000 42%,#2a2622 44%,#1a1714 58%,#3d362e 60%,#1d1a17 100%);box-shadow:0 0 0 6px #1d1a17,0 0 0 8px #3d362e}
+.polaroid .ph{aspect-ratio:1;background:#2a2622 center/cover;display:flex;align-items:center;justify-content:center;font-size:54px;position:relative}
+.polaroid .ph::after{content:"";position:absolute;inset:0;background:#fff;animation:develop 1.6s ease-out forwards}
+@keyframes develop{to{opacity:0}}
+.polaroid p{position:absolute;bottom:10px;left:8px;right:8px;text-align:center;font-family:'Caveat',cursive;font-size:24px;color:#2a2622;line-height:1.1}
+
+/* ---------- silent film ---------- */
+.silent{position:absolute;inset:0;opacity:0;transition:opacity .8s;z-index:2;overflow:hidden;pointer-events:none}
+.silent.on{opacity:1}
+.silent svg{position:absolute;inset:0;width:100%;height:100%;filter:sepia(.9) contrast(1.12) brightness(.95)}
+.silent .flicker{position:absolute;inset:0;background:#000;animation:flick .18s steps(2) infinite;pointer-events:none;z-index:4}
+@keyframes flick{0%{opacity:.02}50%{opacity:.09}}
+.silent .scratch{position:absolute;inset:0;z-index:4;background:linear-gradient(90deg,transparent 49.85%,rgba(255,250,235,.35) 50%,transparent 50.15%) 0 0/31% 100%,linear-gradient(90deg,transparent 49.9%,rgba(0,0,0,.4) 50%,transparent 50.1%) 0 0/57% 100%;animation:scr .7s steps(4) infinite;opacity:.5}
+@keyframes scr{0%{background-position:10% 0,70% 0}25%{background-position:63% 0,22% 0}50%{background-position:37% 0,88% 0}75%{background-position:81% 0,5% 0}}
+.silent .oldvig{position:absolute;inset:0;z-index:4;background:radial-gradient(ellipse at center,transparent 50%,rgba(20,12,4,.75) 100%)}
+.intertitle{position:absolute;inset:0;background:#0d0b09;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;z-index:3}
+.intertitle.show{opacity:1}
+.it-frame{max-width:min(860px,84vw);padding:54px 64px;border:2px solid #cfc2a6;outline:1px solid rgba(207,194,166,.6);outline-offset:9px;text-align:center;position:relative}
+.it-frame::before,.it-frame::after{content:"";position:absolute;left:50%;width:14px;height:14px;background:#0d0b09;border:2px solid #cfc2a6;transform:translateX(-50%) rotate(45deg)}
+.it-frame::before{top:-9px}.it-frame::after{bottom:-9px}
+.it-frame small{font-family:'IM Fell English SC',serif;letter-spacing:.35em;color:#a99c86;font-size:15px;display:block;margin-bottom:20px}
+.it-frame p{font-family:'IM Fell English',Georgia,serif;font-size:clamp(26px,3.5vw,46px);line-height:1.3;color:#efe6d2}
+.it-frame p em{color:#d9b97a}
+.it-frame p .big{display:block;font-family:'IM Fell English SC',serif;font-size:clamp(60px,9vw,120px);line-height:1;margin-top:8px;letter-spacing:.06em;font-style:normal;color:#efe6d2}
+#story .walking .legA{animation:legA .42s ease-in-out infinite alternate}
+#story .walking .legB{animation:legA .42s ease-in-out infinite alternate-reverse}
+#story .walking .bob{animation:bob .21s ease-in-out infinite alternate}
+#story .leg{transform-box:fill-box;transform-origin:50% 0}
+@keyframes legA{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
+@keyframes bob{to{transform:translateY(-6px)}}
+#story .jump{animation:sjump .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes sjump{40%{transform:translateY(-70px)}100%{transform:translateY(0)}}
+#story .st{opacity:0;transition:opacity .25s}
+#story .st.vis{opacity:1}
+#story #binG.rattle{animation:rattle .09s linear infinite}
+@keyframes rattle{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(3px,-2px) rotate(.6deg)}75%{transform:translate(-3px,1px) rotate(-.6deg)}}
+#story #binG{transform-box:fill-box;transform-origin:50% 100%}
+#story #lid{transform-box:fill-box;transform-origin:0% 100%;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+#story #puddle{transform-box:fill-box;transform-origin:50% 50%;transform:scale(0);transition:transform 2.6s ease-out}
+#story #puddle.vis{transform:scale(1)}
+#story #rays{transform-box:fill-box;transform-origin:50% 100%;animation:rays 6s linear infinite}
+@keyframes rays{to{transform:rotate(8deg)}50%{transform:rotate(-8deg)}}
+#story .arm{transform-box:fill-box;transform-origin:50% 0;animation:wave .35s ease-in-out infinite alternate}
+#story .arm.r{animation-delay:.17s}
+@keyframes wave{from{transform:rotate(-35deg)}to{transform:rotate(35deg)}}
+#story .kick{transform-box:fill-box;transform-origin:50% 0;animation:wave .3s ease-in-out infinite alternate}
+#story #bubble{transform-box:fill-box;transform-origin:0% 100%}
+#story #bubble.vis{animation:pop .3s cubic-bezier(.3,1.8,.5,1),rattle .12s linear .3s infinite}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.final-bg{position:absolute;inset:0;background:#000 center 62%/cover no-repeat;opacity:0;filter:sepia(1) brightness(.5);transition:opacity 1.2s,filter 3s ease;z-index:1}
+.final-bg.show{opacity:.32}
+.final-bg.color{filter:none}
+.final-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.35),rgba(0,0,0,.85))}
+.bday-skip{position:absolute;bottom:calc(11vh + 14px);right:20px;z-index:6;background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.2em;padding:8px 12px}
+.bday-skip:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ---------- birthday overlay ---------- */
+.bday{position:fixed;inset:0;z-index:140;background:#000;display:none;align-items:center;justify-content:center;overflow:hidden}
+.bday.open{display:flex}
+.bday .lb{position:absolute;left:0;right:0;height:11vh;background:#000;z-index:5;border-color:#1a1714;border-style:solid}
+.bday .lb.t{top:0;border-width:0 0 1px}.bday .lb.b{bottom:0;border-width:1px 0 0}
+.bday canvas{position:absolute;inset:0;width:100%;height:100%}
+#confetti{z-index:4;pointer-events:none}
+.stage{position:relative;z-index:3;text-align:center;padding:0 6vw;width:100%}
+.scene{opacity:0;transform:scale(1.04);transition:opacity 1.2s,transform 3s ease-out}
+.scene.in{opacity:1;transform:scale(1)}
+.scene.out{opacity:0;transition:opacity .7s}
+.scene small{font-family:var(--mono);font-size:13px;letter-spacing:.45em;color:var(--dim);text-transform:uppercase}
+.scene .bigname{font-family:var(--display);font-weight:400;font-size:clamp(90px,20vw,280px);line-height:.9;margin-top:12px}
+.bday-roll{position:absolute;left:0;right:0;top:100%;text-align:center}
+.bday-roll.go{animation:broll var(--dur,14s) linear forwards}
+@keyframes broll{to{transform:translateY(calc(-100% - 100vh))}}
+.hb{font-family:var(--display);font-size:clamp(80px,15vw,220px);line-height:.85;color:var(--ink);letter-spacing:.02em}
+.hb-name{font-family:var(--display);font-size:clamp(40px,7vw,90px);letter-spacing:.08em;margin-top:6px;color:var(--amber)}
+.hb-pre{font-family:'IM Fell English',serif;font-style:italic;font-size:clamp(18px,2vw,24px);color:#d8cfc0;margin-bottom:14px}
+.hb-msg{max-width:640px;margin:28px auto 0;line-height:1.8;color:#d8cfc0;font-size:clamp(15px,1.6vw,18px);opacity:0;transition:opacity 1.5s 1.2s}
+.scene.in .hb-msg{opacity:1}
+.hb-from{font-family:var(--mono);color:var(--amber);letter-spacing:.2em;margin-top:20px;font-size:13px;text-transform:uppercase;opacity:0;transition:opacity 1.5s 2.2s}
+.scene.in .hb-from{opacity:1}
+.bday-actions{display:flex;gap:12px;justify-content:center;margin-top:34px;opacity:0;transition:opacity 1s 3s}
+.scene.in .bday-actions{opacity:1}
+.bday-actions button{font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;background:none;border:1px solid var(--line);color:var(--ink);padding:12px 18px}
+.bday-actions button:hover{border-color:var(--amber);color:var(--amber)}
+.bday-close{position:absolute;top:calc(11vh + 14px);right:20px;z-index:6;background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.2em}
+.bday-close:hover{color:var(--ink)}
+
+@media (max-width:700px){
+  section{padding:100px 6vw}
+  .hud.bl{display:none}
+  .split{height:auto}
+  .pane{position:relative;min-height:60vh;padding:12vw 6vw}
+  .pane.film{clip-path:none!important;align-items:flex-start;text-align:left}
+  .pane.film p{margin-left:0}
+  .divider,.split-hint{display:none}
+  .track-head{width:70px;padding-left:10px}.ruler{padding-left:70px}
+  @keyframes sweep{from{left:70px}to{left:100%}}
+}
+@media (prefers-reduced-motion:reduce){.grain{animation:none}}
+</style>
+</head>
+<body class="locked">
+
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="cursor" id="cursor"><b></b><i></i></div>
+<div class="flash" id="flash"></div>
+
+<!-- HUD -->
+<div class="hud tl rec"><i></i>REC</div>
+<div class="hud tr" id="timecode">00:00:00:00</div>
+<div class="hud bl"><svg class="reel-icon" id="reelIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="6.5" r="2"/><circle cx="12" cy="17.5" r="2"/><circle cx="6.5" cy="12" r="2"/><circle cx="17.5" cy="12" r="2"/></svg><span id="sceneLabel">REEL 01 · SCENE 01 — OPENING</span></div>
+<div class="hud br"><button class="sound-btn" id="soundBtn" data-blip><span class="bars"><span></span><span></span><span></span><span></span></span><span id="soundTxt">SOUND ON</span></button></div>
+
+<!-- INTRO GATE -->
+<div class="gate" id="gate">
+  <canvas class="leader" id="leader"></canvas>
+  <small id="gateTop">Now Presenting</small>
+  <button class="gate-btn" id="enterBtn">▶ ENTER THE THEATRE</button>
+  <small>🔊 best with sound on</small>
+  <button class="skip" id="skipBtn">skip intro →</button>
+</div>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="hero" data-scene="OPENING">
+    <div class="letterbox t"></div><div class="letterbox b"></div>
+    <div class="hero-photo" id="heroPhoto"></div>
+    <div class="leak a"></div><div class="leak b"></div><div class="leak c"></div>
+    <div class="flare"></div>
+    <div class="hero-inner">
+      <div class="presents" id="presents"></div>
+      <h1 class="name" id="heroName"></h1>
+      <div class="roles"><span class="typed" id="typed"></span><span class="caret"></span></div>
+      <p class="tagline" id="tagline"></p>
+    </div>
+    <div class="scroll-cue">SCROLL TO ROLL</div>
+  </section>
+
+  <!-- CLAPPERBOARD -->
+  <section class="clap-sec" id="clapSec" data-scene="SLATE">
+    <div>
+      <div class="clapper" id="clapper" data-big>
+        <div class="clap-stick"></div><div class="clap-hinge"></div>
+        <div class="clap-board">
+          <div class="wide"><small>Production</small><b id="clapProd"></b></div>
+          <div><small>Roll</small><b>A01</b></div><div><small>Scene</small><b>02</b></div><div><small>Take</small><b id="clapTake">1</b></div>
+          <div><small>Director</small><b id="clapDir"></b></div><div><small>Camera</small><b id="clapCam"></b></div><div><small>Date</small><b id="clapDate"></b></div>
+        </div>
+      </div>
+      <div class="clap-hint">tap the slate for another take</div>
+    </div>
+  </section>
+
+  <!-- SHOWREEL -->
+  <section id="reel" data-scene="SHOWREEL">
+    <div class="eyebrow reveal-up">Showreel</div>
+    <h2 class="reveal-up">Watch the<br>showreel.</h2>
+    <a class="reel-frame reveal-up" id="reelLink" target="_blank" rel="noopener" data-blip data-big>
+      <div class="reel-bg"></div><div class="scan"></div>
+      <span class="corner a"></span><span class="corner b"></span>
+      <div class="frame-meta t">● PLAY REEL</div>
+      <div class="play"></div>
+      <div class="frame-meta l" id="reelMeta"></div>
+      <div class="frame-meta r">2.39 : 1 · 24 FPS</div>
+    </a>
+  </section>
+
+  <div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+
+  <!-- WORK -->
+  <section id="work" data-scene="SELECTED WORK">
+    <div class="eyebrow reveal-up">Selected Work</div>
+    <h2 class="reveal-up">Edits, films<br>&amp; builds.</h2>
+    <div class="filters reveal-up" id="filters">
+      <button class="on" data-f="all" data-blip>All</button><button data-f="film" data-blip>Film</button><button data-f="tech" data-blip>Tech</button>
+    </div>
+    <div class="work-grid" id="workGrid"></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="edit" data-scene="THE EDIT">
+    <div class="eyebrow reveal-up">Tools &amp; Skills</div>
+    <h2 class="reveal-up">What I<br>work with.</h2>
+    <div class="timeline" id="timeline">
+      <div class="playhead"></div>
+      <div class="ruler"><span>00:00</span><span>00:10</span><span>00:20</span><span>00:30</span><span>00:40</span><span>00:50</span></div>
+      <div id="tracks"></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="numbers" data-scene="BY THE NUMBERS">
+    <div class="eyebrow reveal-up">In Numbers</div>
+    <h2 class="reveal-up">The work<br>so far.</h2>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <!-- SPLIT -->
+  <section id="sides" data-scene="TWO SIDES">
+    <div class="eyebrow reveal-up">Two Disciplines</div>
+    <h2 class="reveal-up">Code &amp;<br>cinema.</h2>
+    <div class="split" id="split">
+      <div class="pane code">
+        <h3>&lt;engineer/&gt;</h3>
+        <p id="engText"></p>
+        <pre id="codeBlock"></pre>
+        <div class="build" id="build">$ npm run build <b>▸ 50%</b></div>
+      </div>
+      <div class="pane film" id="filmPane">
+        <svg class="big-reel" id="bigReel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="7" fill="currentColor"/><circle cx="50" cy="24" r="11" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="76" r="11" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="24" cy="50" r="11" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="76" cy="50" r="11" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+        <div class="reel-count" id="reelCount">REEL ▸ 50%</div>
+        <h3>FILMMAKER</h3>
+        <p id="filmText"></p>
+        <div class="filmstrip"><div class="strip" id="strip"></div></div>
+      </div>
+      <div class="divider" id="divider"></div>
+    </div>
+    <div class="split-hint">← move across the frame →</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" data-scene="ABOUT">
+    <div class="eyebrow reveal-up">About</div>
+    <div class="about-grid">
+      <p class="about-text" id="aboutText"></p>
+      <figure class="about-photo reveal-up"><img id="aboutImg" alt=""><figcaption id="aboutCap"></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact" data-scene="CONTACT">
+    <div class="eyebrow reveal-up" style="justify-content:center">Contact</div>
+    <h2 class="reveal-up">Let's work<br><em>together.</em></h2>
+    <div class="ticket reveal-up">
+      <div class="t-main">
+        <small>ADMIT ONE · WORLD PREMIERE</small>
+        <h4 id="tName"></h4>
+        <div class="t-row"><div>Screen<b>01</b></div><div>Row<b>A</b></div><div>Seat<b>∞</b></div><div>Showtime<b>Always</b></div></div>
+      </div>
+      <div class="t-stub" id="socials"></div>
+    </div>
+    <div class="email-text reveal-up" id="emailText"></div>
+  </section>
+
+  <!-- SECRET REEL -->
+  <section class="secret" id="secret" data-scene="SECRET REEL">
+    <div class="beam a"></div><div class="beam b"></div>
+    <div class="eyebrow reveal-up" style="justify-content:center">Restricted</div>
+    <div class="can-wrap reveal-up">
+      <div class="can"></div>
+      <div class="can-label"><small>REEL 00</small><b>THE ORIGIN STORY</b><i>DO NOT WATCH</i></div>
+    </div>
+    <h2 class="reveal-up">One more reel.</h2>
+    <p class="secret-sub reveal-up">Found in the archives. Rated <b>B</b> for Birthday. Turn your sound on.</p>
+    <button class="secret-btn reveal-up" id="secretBtn" data-big>▶ PLAY THE SECRET REEL</button>
+  </section>
+
+  <!-- END CREDITS -->
+  <section class="credits" id="credits" data-scene="END CREDITS">
+    <div class="credits-roll" id="creditsRoll"></div>
+  </section>
+  <div class="post-credits">
+    <button class="pc-btn" id="pcBtn" data-blip data-big>There's a post-credits scene ▸</button>
+    <p>Don't leave yet.</p>
+  </div>
+  <footer><span id="footName"></span><span>Hyderabad, India</span></footer>
+</main>
+<button class="reel-pill" id="reelPill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="6.5" r="2"/><circle cx="12" cy="17.5" r="2"/><circle cx="6.5" cy="12" r="2"/><circle cx="17.5" cy="12" r="2"/></svg><span>A secret reel is waiting for you</span><b>▸</b><em id="pillX" aria-label="dismiss">✕</em></button>
+
+<!-- BIRTHDAY OVERLAY -->
+<div class="bday" id="bday">
+  <div class="lb t"></div><div class="lb b"></div>
+  <div class="final-bg" id="finalBg"></div>
+  <div class="silent" id="silent">
+    <svg id="story" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="glowG"><stop offset="0" stop-color="#fffbe8"/><stop offset=".5" stop-color="#fff3c9" stop-opacity=".55"/><stop offset="1" stop-color="#fff3c9" stop-opacity="0"/></radialGradient>
+        <clipPath id="binClip"><rect x="0" y="0" width="1600" height="722"/></clipPath>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8cfbd"/><stop offset="1" stop-color="#aa9d86"/></linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#skyG)"/>
+      <circle cx="1380" cy="170" r="60" fill="#efe6d2" opacity=".7"/>
+      <g fill="#958870"><rect x="0" y="430" width="140" height="290"/><rect x="150" y="370" width="110" height="350"/><rect x="270" y="455" width="160" height="265"/><rect x="440" y="395" width="95" height="325"/><rect x="1030" y="415" width="120" height="305"/><rect x="1155" y="470" width="80" height="250"/></g>
+      <g fill="#b3a68e"><rect x="20" y="460" width="22" height="30"/><rect x="70" y="460" width="22" height="30"/><rect x="20" y="520" width="22" height="30"/><rect x="175" y="400" width="20" height="28"/><rect x="215" y="400" width="20" height="28"/><rect x="175" y="460" width="20" height="28"/><rect x="300" y="490" width="26" height="30"/><rect x="360" y="490" width="26" height="30"/><rect x="465" y="430" width="20" height="28"/><rect x="1055" y="450" width="24" height="30"/><rect x="1100" y="450" width="24" height="30"/></g>
+      <rect y="720" width="1600" height="180" fill="#6f6352"/><rect y="720" width="1600" height="8" fill="#584d3f"/>
+      <g fill="#5e5345"><rect x="120" y="790" width="140" height="6"/><rect x="520" y="820" width="180" height="6"/><rect x="980" y="800" width="150" height="6"/><rect x="1380" y="830" width="120" height="6"/></g>
+      <g transform="translate(-190 0)"><rect x="545" y="390" width="10" height="330" fill="#3d352b"/><path d="M550 392 q40 -22 72 0" stroke="#3d352b" stroke-width="10" fill="none"/><rect x="606" y="388" width="32" height="14" fill="#3d352b"/></g>
+      <g id="shop"><rect x="1250" y="420" width="330" height="300" fill="#c2b59e"/><rect x="1250" y="395" width="330" height="44" fill="#4a4136"/>
+        <text x="1415" y="426" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="28" fill="#efe6d2">KIRANA STORE</text>
+        <g><rect x="1250" y="439" width="55" height="38" fill="#7d705c"/><rect x="1305" y="439" width="55" height="38" fill="#efe6d2"/><rect x="1360" y="439" width="55" height="38" fill="#7d705c"/><rect x="1415" y="439" width="55" height="38" fill="#efe6d2"/><rect x="1470" y="439" width="55" height="38" fill="#7d705c"/><rect x="1525" y="439" width="55" height="38" fill="#efe6d2"/></g>
+        <rect x="1300" y="520" width="90" height="200" fill="#4a4136"/><rect x="1425" y="520" width="120" height="86" fill="#8e816c"/><text x="1485" y="572" font-size="26" text-anchor="middle" fill="#efe6d2" font-family="'IM Fell English SC',serif">MILK</text></g>
+      <g id="tree"><rect x="690" y="520" width="34" height="200" fill="#4a4136"/><circle cx="707" cy="475" r="92" fill="#5a4f40"/><circle cx="648" cy="520" r="62" fill="#5a4f40"/><circle cx="770" cy="512" r="64" fill="#5a4f40"/></g>
+      <ellipse id="puddle" cx="672" cy="727" rx="58" ry="9" fill="#8f826c"/>
+      <g id="rays" class="st"><polygon points="985,600 860,80 930,80" fill="#fff6d6" opacity=".55"/><polygon points="985,600 1010,60 1080,60" fill="#fff6d6" opacity=".55"/><polygon points="985,600 1150,120 1210,150" fill="#fff6d6" opacity=".45"/><polygon points="985,600 760,140 810,110" fill="#fff6d6" opacity=".45"/></g>
+      <circle id="glow" class="st" cx="985" cy="560" r="300" fill="url(#glowG)"/>
+      <g id="binG">
+        <ellipse cx="985" cy="602" rx="80" ry="12" fill="#1f241c"/>
+        <g clip-path="url(#binClip)"><g id="baby" style="transform:translate(985px,668px)">
+          <g class="arm"><rect x="-58" y="62" width="18" height="52" rx="9" fill="#a8805e"/></g>
+          <g class="arm r"><rect x="40" y="62" width="18" height="52" rx="9" fill="#a8805e"/></g>
+          <ellipse cx="0" cy="105" rx="46" ry="54" fill="#b38b68"/>
+          <path d="M-46 112 Q0 175 46 112 L40 150 Q0 172 -40 150 Z" fill="#f4efe3"/>
+          <g class="kick"><rect x="-36" y="146" width="20" height="40" rx="10" fill="#a8805e"/></g>
+          <g class="kick" style="animation-delay:.15s"><rect x="16" y="146" width="20" height="40" rx="10" fill="#a8805e"/></g>
+          <circle r="66" fill="#efe6d2"/>
+          <image href="photos/baby-face.png" x="-63" y="-63" width="126" height="126"/>
+          <path d="M-14 -66 q14 -26 28 0" stroke="#1d1a17" stroke-width="5" fill="none"/>
+        </g></g>
+        <path d="M905 600 L1065 600 L1050 722 L920 722 Z" fill="#4c5845"/>
+        <rect x="912" y="640" width="146" height="10" fill="#3c4637"/>
+        <text x="985" y="694" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="30" fill="#d8cfbd">GHMC</text>
+        <g id="lid"><rect x="899" y="584" width="172" height="18" rx="7" fill="#323b2d"/><rect x="965" y="572" width="40" height="14" rx="6" fill="#323b2d"/></g>
+      </g>
+      <g id="sum" style="transform:translate(-150px,720px)">
+        <g id="sumInner"><g class="bob">
+          <g class="leg legA"><rect x="-22" y="-122" width="20" height="122" rx="8" fill="#3d352b"/></g>
+          <g class="leg legB"><rect x="2" y="-122" width="20" height="122" rx="8" fill="#2f2921"/></g>
+          <rect x="-34" y="-238" width="68" height="124" rx="16" fill="#7a869a"/>
+          <g class="leg legB"><rect x="-8" y="-228" width="16" height="100" rx="8" fill="#6b7689"/></g>
+          <circle cx="0" cy="-272" r="36" fill="#b38b68"/>
+          <path d="M-38 -276 q2 -46 40 -44 q40 -2 36 40 q-10 -20 -40 -22 q-24 0 -36 26z" fill="#1d1a17"/>
+          <circle cx="18" cy="-274" r="4" fill="#1d1a17"/>
+          <path d="M14 -254 q8 4 14 0" stroke="#1d1a17" stroke-width="3" fill="none"/>
+          <g id="censor" class="st"><rect x="8" y="-162" width="130" height="42" fill="#0d0b09"/><text x="73" y="-134" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="17" fill="#efe6d2" letter-spacing="2">CENSORED</text></g>
+          <text id="bang" class="st" x="0" y="-330" text-anchor="middle" font-family="'IM Fell English',serif" font-size="110" fill="#1d1a17">!</text>
+        </g></g>
+        <g id="sTag" class="st"><text x="0" y="-372" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="30" fill="#1d1a17" letter-spacing="3">SUMANTH</text><path d="M0 -360 v28 m-9 -10 l9 10 l9 -10" stroke="#1d1a17" stroke-width="3" fill="none"/></g>
+      </g>
+      <text id="psss" class="st" x="760" y="640" font-family="'IM Fell English',serif" font-style="italic" font-size="44" fill="#1d1a17">psssssss…</text>
+      <g id="bubble" class="st"><path d="M1060 470 L1090 400 L1120 450 L1160 380 L1190 440 L1250 400 L1240 470 L1300 490 L1240 520 L1260 580 L1190 550 L1150 610 L1120 545 L1070 575 L1085 520 L1030 505 Z" fill="#efe6d2" stroke="#1d1a17" stroke-width="5"/><text x="1162" y="508" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="46" fill="#1d1a17">WAAH!</text></g>
+      <g id="babyTag" class="st"><text x="985" y="300" text-anchor="middle" font-family="'IM Fell English SC',serif" font-size="28" fill="#1d1a17" letter-spacing="2">ANAND · AGE 0 · BEARD: YES</text><path d="M985 312 v26 m-9 -10 l9 10 l9 -10" stroke="#1d1a17" stroke-width="3" fill="none"/></g>
+    </svg>
+    <div class="oldvig"></div><div class="scratch"></div><div class="flicker"></div>
+    <div class="intertitle" id="intertitle"><div class="it-frame"><small id="itSmall"></small><p id="itText"></p></div></div>
+  </div>
+  <canvas id="leader2"></canvas>
+  <canvas id="confetti"></canvas>
+  <div class="camera" id="camera"><div class="cam-btn"></div><div class="cam-body"></div><div class="cam-slot"></div><div class="cam-stripe"></div><div class="cam-flash" id="camFlash"></div><div class="cam-lens"></div></div>
+  <button class="bday-close" id="bdayClose">✕ CLOSE</button>
+  <button class="bday-skip" id="bdaySkip">SKIP TO THE END ›</button>
+  <div class="stage" id="stage"></div>
+</div>
+
+<script>
+/* =====================================================================
+   EDIT EVERYTHING HERE ✏️  — swap placeholders for your friend's details
+   ===================================================================== */
+const CONFIG = {
+  name: "Anand",                        // first name, shows huge in the hero
+  fullName: "Anand Kumar Eluri",
+  presents: "Presenting",               // small line above the name
+  roles: ["Video Editor", "Filmmaker", "Engineer"],
+  tagline: "Video editor and filmmaker based in Hyderabad. Computer Science student at CMR College of Engineering & Technology.",
+  heroImage: "photos/hero.jpg",          // big cinematic banner behind the name
+  aboutImage: "photos/wall.jpg",
+  showreel: { url: "https://youtube.com/", label: "SHOWREEL 2026 · 01:42" },   // paste his best edit link
+
+  works: [   // cat: "film" or "tech". colors = thumbnail gradient. url = YouTube / Insta / GitHub link
+    { cat: "film", title: "Midnight Chai",   type: "Short Film",     year: "2026", tc: "00:04:12", url: "", colors: ["#3b1d0b", "#ff8a3d"] },
+    { cat: "tech", locked: true, title: "Classified", type: "Next build loading", year: "2027", tc: "v0.0", url: "", colors: ["#0b2b22", "#5fe0a0"] },
+    { cat: "film", title: "Campus Fest '25", type: "Aftermovie",     year: "2025", tc: "00:02:30", url: "", colors: ["#0b1d3b", "#4da3ff"] },
+    { cat: "tech", locked: true, title: "Classified", type: "Next build loading", year: "2027", tc: "v0.0", url: "", colors: ["#0b1a2b", "#4dd2ff"] },
+    // ↑ locked: true shows a blurred "CLASSIFIED" card. To unlock, delete locked: true and fill in title/type/url.
+    { cat: "film", title: "Glitch",          type: "Music Video",    year: "2025", tc: "00:03:20", url: "", colors: ["#2b0b2b", "#d36bff"] },
+    { cat: "film", title: "Golden Hour",     type: "Color Grade",    year: "2024", tc: "00:01:30", url: "", colors: ["#2b220b", "#ffd36b"] },
+  ],
+
+  tracks: [  // skills, shown as an editing timeline
+    { id: "v1", label: "EDIT", clips: ["Premiere Pro", "DaVinci Resolve", "After Effects", "CapCut"] },
+    { id: "v2", label: "FILM", clips: ["Direction", "Cinematography", "Color Grading", "Storyboards"] },
+    { id: "a1", label: "CODE", clips: ["Python", "Web Dev", "Java", "AI / ML"] },
+  ],
+
+  engineerText: "B.Tech in Computer Science (AI & ML) at CMR College of Engineering & Technology, Hyderabad.",
+  filmText: "Editing, cinematography and color grading, working toward directing.",
+
+  about: "I'm Anand, a computer science student in Hyderabad who *edits* videos and makes *short films*. I care about pacing, color and sound, and I'm working toward *directing*. Open to editing work and film collaborations.",
+
+  socials: [
+    { label: "Instagram", url: "https://instagram.com/" },
+    { label: "YouTube",   url: "https://youtube.com/" },
+    { label: "LinkedIn",  url: "https://linkedin.com/" },
+  ],
+  email: "friend@email.com",
+
+  stats: [   // "box office" counters
+    { n: 50, suffix: "+", label: "Projects edited" },
+    { n: 4,  suffix: "yrs", label: "Editing" },
+    { n: 5,  suffix: "",  label: "Short films" },
+    { n: 6,  suffix: "",  label: "Tools mastered" },
+  ],
+  marquee: ["Anand Kumar Eluri", "Video Editor", "Filmmaker", "Engineer", "Hyderabad"],
+
+  /* ---------- 🎂 the post-credits birthday surprise ---------- */
+  birthday: {
+    enabled: true,            // set to false to remove the surprise after the birthday
+    from: "Sumanth, Harsha & Prasangi",
+    presents: "Your crew presents",
+    photos: [   // "Behind the Scenes" montage, popped out of an instant camera
+      { src: "photos/cake.jpg",        caption: "Cake 1 — Anand 0" },
+      { src: "photos/sleep-train.jpg", caption: "Peak focus" },
+      { src: "photos/bus-row.jpg",     caption: "Booked the whole row" },
+      { src: "photos/sleep-bus.jpg",   caption: "Shoulder: borrowed" },
+      { src: "photos/selfie.jpg",      caption: "Official headshot" },
+    ],
+    message: "Happy birthday, Anand. Your work deserved a proper home, so we built you one. It's yours now: swap in your edits, change anything you like. Have a great year.",
+  },
+
+};
+/* ===================================================================== */
+
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------------- AUDIO ENGINE (all sounds generated live, no files) ---------------- */
+const SFX = {
+  ctx: null, master: null, on: true, projTimer: null, hum: [], drone: null,
+  init() {
+    if (this.ctx) { this.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain(); this.master.gain.value = 0.7; this.master.connect(this.ctx.destination);
+    const len = this.ctx.sampleRate * 2, buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    this.noiseBuf = buf;
+  },
+  ok() { return this.ctx && this.on; },
+  noise() { const s = this.ctx.createBufferSource(); s.buffer = this.noiseBuf; s.loop = true; return s; },
+  env(g, t, peak, a, r) { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + r); },
+  beep(freq = 1000, dur = .14, vol = .22) {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+    o.type = "sine"; o.frequency.value = freq; this.env(g, t, vol, .005, dur); o.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur + .05);
+  },
+  blip() { this.beep(1800, .04, .04); },
+  boom() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.setValueAtTime(2200, t); f.frequency.exponentialRampToValueAtTime(90, t + 3.2);
+    const g = c.createGain(); this.env(g, t, .55, .04, 3.6); f.connect(g); g.connect(this.master);
+    [55, 55.6, 110.4, 82.4, 27.5].forEach(fr => { const o = c.createOscillator(); o.type = "sawtooth"; o.frequency.value = fr; o.connect(f); o.start(t); o.stop(t + 3.8); });
+    const n = this.noise(), nf = c.createBiquadFilter(), ng = c.createGain();
+    nf.type = "lowpass"; nf.frequency.value = 700; this.env(ng, t, .45, .005, .7);
+    n.connect(nf); nf.connect(ng); ng.connect(this.master); n.start(t); n.stop(t + .8);
+  },
+  whoosh() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "bandpass"; f.Q.value = 1.2; f.frequency.setValueAtTime(250, t); f.frequency.exponentialRampToValueAtTime(2800, t + .35); f.frequency.exponentialRampToValueAtTime(300, t + .8);
+    this.env(g, t, .14, .3, .55); n.connect(f); f.connect(g); g.connect(this.master); n.start(t); n.stop(t + 1);
+  },
+  tick() {
+    const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "highpass"; f.frequency.value = 1800; this.env(g, t, .05 + Math.random() * .04, .002, .02);
+    n.connect(f); f.connect(g); g.connect(this.master); n.start(t, Math.random()); n.stop(t + .04);
+  },
+  startProjector() {
+    if (!this.ctx) return; this.stopProjector();
+    this.projTimer = setInterval(() => { if (this.on) this.tick(); }, 62);
+    const c = this.ctx;
+    [[50, "sine", .03], [100, "triangle", .012]].forEach(([fr, type, v]) => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = fr; g.gain.value = v;
+      o.connect(g); g.connect(this.master); o.start(); this.hum.push(o);
+    });
+  },
+  stopProjector() { clearInterval(this.projTimer); this.hum.forEach(o => { try { o.stop(); } catch (e) {} }); this.hum = []; },
+  startDrone() {
+    if (!this.ctx || this.drone) return; const c = this.ctx, dg = c.createGain(), lp = c.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 900; dg.gain.setValueAtTime(0.0001, c.currentTime); dg.gain.exponentialRampToValueAtTime(.05, c.currentTime + 5);
+    lp.connect(dg); dg.connect(this.master);
+    [110, 164.81, 220, 329.63, 110.4].forEach((fr, i) => {
+      const o = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+      o.type = i % 2 ? "triangle" : "sine"; o.frequency.value = fr; g.gain.value = .25;
+      lfo.frequency.value = .05 + i * .03; lg.gain.value = .2; lfo.connect(lg); lg.connect(g.gain);
+      o.connect(g); g.connect(lp); o.start(); lfo.start();
+    });
+    this.drone = dg;
+  },
+  droneTo(v, s = 1.5) { if (!this.drone) return; const t = this.ctx.currentTime; this.drone.gain.cancelScheduledValues(t); this.drone.gain.setValueAtTime(Math.max(this.drone.gain.value, .0001), t); this.drone.gain.exponentialRampToValueAtTime(Math.max(v, .0001), t + s); },
+  clap() {   // clapperboard snap
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    const n = this.noise(), f = c.createBiquadFilter(), g = c.createGain(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .8;
+    this.env(g, t, .6, .001, .09); n.connect(f); f.connect(g); g.connect(this.master); n.start(t, Math.random()); n.stop(t + .15);
+    const o = c.createOscillator(), og = c.createGain(); o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(50, t + .15);
+    this.env(og, t, .5, .002, .18); o.connect(og); og.connect(this.master); o.start(t); o.stop(t + .25);
+  },
+  shutter() {   // camera shutter + film advance
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    [0, .06].forEach((d, i) => { const n = this.noise(), f = c.createBiquadFilter(), g = c.createGain(); f.type = "highpass"; f.frequency.value = i ? 2500 : 3500;
+      this.env(g, t + d, .35, .001, .04); n.connect(f); f.connect(g); g.connect(this.master); n.start(t + d, Math.random()); n.stop(t + d + .06); });
+    const o = c.createOscillator(), g = c.createGain(); o.type = "square"; o.frequency.setValueAtTime(900, t + .1); o.frequency.linearRampToValueAtTime(600, t + .35);
+    this.env(g, t + .1, .02, .01, .25); o.connect(g); g.connect(this.master); o.start(t + .1); o.stop(t + .4);
+  },
+  key() {   // typewriter key
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "bandpass"; f.frequency.value = 2500 + Math.random() * 1500; f.Q.value = 3; this.env(g, t, .12, .001, .025);
+    n.connect(f); f.connect(g); g.connect(this.master); n.start(t, Math.random()); n.stop(t + .04);
+  },
+  riser(dur = 1.2) {   // tension build before a hit
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    const n = this.noise(), f = c.createBiquadFilter(), g = c.createGain(); f.type = "bandpass"; f.Q.value = 2;
+    f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.25, t + dur); g.gain.linearRampToValueAtTime(0, t + dur + .02);
+    n.connect(f); f.connect(g); g.connect(this.master); n.start(t); n.stop(t + dur + .05);
+    const o = c.createOscillator(), og = c.createGain(); o.type = "sawtooth"; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(900, t + dur);
+    og.gain.setValueAtTime(.0001, t); og.gain.exponentialRampToValueAtTime(.06, t + dur); og.gain.linearRampToValueAtTime(0, t + dur + .02);
+    o.connect(og); og.connect(this.master); o.start(t); o.stop(t + dur + .05);
+  },
+  glitch() {   // digital stutter for locked cards
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain(); o.type = "square"; g.gain.value = 0;
+    o.connect(g); g.connect(this.master);
+    for (let i = 0; i < 7; i++) { const tt = t + i * .035; o.frequency.setValueAtTime(80 + Math.random() * 1200, tt); g.gain.setValueAtTime(Math.random() < .7 ? .04 : 0, tt); }
+    g.gain.setValueAtTime(0, t + .25); o.start(t); o.stop(t + .26);
+  },
+  tear() {   // ticket tear
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    for (let i = 0; i < 14; i++) { const tt = t + i * .03 + Math.random() * .015, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+      f.type = "highpass"; f.frequency.value = 1500 + i * 200; this.env(g, tt, .05 + Math.random() * .06, .002, .03);
+      n.connect(f); f.connect(g); g.connect(this.master); n.start(tt, Math.random()); n.stop(tt + .05); }
+  },
+  chime(i) { if (!this.ok()) return; const p = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5]; this.note(p[i % p.length], this.ctx.currentTime, .25, .35); },
+  rewind() {   // tape rewind
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(90, t + .7); f.type = "lowpass"; f.frequency.value = 2500;
+    this.env(g, t, .08, .02, .7); o.connect(f); f.connect(g); g.connect(this.master); o.start(t); o.stop(t + .8);
+  },
+  applause(dur = 5) {   // crowd clapping
+    if (!this.ok()) return; const c = this.ctx, t0 = c.currentTime, total = dur * 45;
+    for (let i = 0; i < total; i++) { const p = i / total, tt = t0 + p * dur + Math.random() * .05, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+      f.type = "bandpass"; f.frequency.value = 1000 + Math.random() * 2000; f.Q.value = 1.5; this.env(g, tt, (.06 + Math.random() * .06) * (1 - p * .8), .002, .05);
+      n.connect(f); f.connect(g); g.connect(this.master); n.start(tt, Math.random() * 1.5); n.stop(tt + .08); }
+  },
+  footstep() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = "lowpass"; f.frequency.value = 380; this.env(g, t, .35, .004, .09); n.connect(f); f.connect(g); g.connect(this.master); n.start(t, Math.random()); n.stop(t + .12);
+  },
+  trickle(d = 3) {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, n = this.noise(), f = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+    f.type = "bandpass"; f.frequency.value = 2800; f.Q.value = 2.5; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.07, t + .3); g.gain.setValueAtTime(.07, t + d - .4); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    lfo.frequency.value = 13; lg.gain.value = .03; lfo.connect(lg); lg.connect(g.gain);
+    n.connect(f); f.connect(g); g.connect(this.master); n.start(t); lfo.start(t); n.stop(t + d); lfo.stop(t + d);
+  },
+  cry() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = c.createOscillator(), v = c.createOscillator(), vg = c.createGain(), f1 = c.createBiquadFilter(), g = c.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(400, t); o.frequency.linearRampToValueAtTime(560, t + .28); o.frequency.linearRampToValueAtTime(360, t + .85);
+    v.frequency.value = 7; vg.gain.value = 18; v.connect(vg); vg.connect(o.frequency);
+    f1.type = "bandpass"; f1.frequency.setValueAtTime(900, t); f1.frequency.linearRampToValueAtTime(1400, t + .3); f1.Q.value = 3;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.3, t + .06); g.gain.setValueAtTime(.3, t + .6); g.gain.exponentialRampToValueAtTime(.0001, t + .9);
+    o.connect(f1); f1.connect(g); g.connect(this.master); o.start(t); v.start(t); o.stop(t + .95); v.stop(t + .95);
+  },
+  clang() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime;
+    [[523, .2], [1187, .12], [1843, .08], [2650, .05]].forEach(([fr, v]) => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = fr; this.env(g, t, v, .002, 1.3); o.connect(g); g.connect(this.master); o.start(t); o.stop(t + 1.4); });
+    const n = this.noise(), g = c.createGain(); this.env(g, t, .25, .001, .06); n.connect(g); g.connect(this.master); n.start(t); n.stop(t + .1);
+  },
+  choir(d = 4) {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, f = c.createBiquadFilter(), lp = c.createBiquadFilter(), g = c.createGain();
+    f.type = "bandpass"; f.frequency.value = 850; f.Q.value = 1.2; lp.type = "lowpass"; lp.frequency.value = 3000;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t + 1.1); g.gain.setValueAtTime(.22, t + d - 1); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    f.connect(lp); lp.connect(g); g.connect(this.master);
+    [261.63, 329.63, 392, 523.25].forEach(fr => [-7, 7].forEach(dt => { const o = c.createOscillator(); o.type = "sawtooth"; o.frequency.value = fr; o.detune.value = dt; o.connect(f); o.start(t); o.stop(t + d); }));
+  },
+  boing() {
+    if (!this.ok()) return; const c = this.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+    o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(900, t + .12); o.frequency.exponentialRampToValueAtTime(600, t + .35);
+    this.env(g, t, .2, .005, .4); o.connect(g); g.connect(this.master); o.start(t); o.stop(t + .45);
+  },
+  pnote(fr, t, dest, v) {
+    const c = this.ctx; [[0, "triangle", 1], [5, "sine", .5]].forEach(([dt, type, m]) => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = fr; o.detune.value = dt;
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v * m, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .7);
+      o.connect(g); g.connect(dest); o.start(t); o.stop(t + .75); });
+  },
+  startPiano() {   // silent-movie oom-pah piano
+    if (!this.ctx || this.piano) return; const c = this.ctx, g = c.createGain();
+    g.gain.setValueAtTime(.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(.55, c.currentTime + .8); g.connect(this.master);
+    const prog = [[130.81, [261.63, 329.63, 392]], [98, [246.94, 293.66, 392]], [110, [261.63, 329.63, 440]], [87.31, [261.63, 349.23, 440]]];
+    let step = 0; const beat = .29;
+    const tick = () => {
+      if (!this.on) { step++; return; }
+      const t = c.currentTime + .03, [bass, ch] = prog[Math.floor(step / 4) % 4], pos = step % 4;
+      if (pos % 2 === 0) this.pnote(pos === 2 ? bass * 1.5 : bass, t, g, .3); else ch.forEach(f => this.pnote(f, t, g, .09));
+      if (Math.random() < .55) this.pnote(ch[Math.floor(Math.random() * 3)] * 2, t + beat / 2, g, .08);
+      step++;
+    };
+    tick(); this.piano = { g, timer: setInterval(tick, beat * 1000) };
+  },
+  stopPiano() {
+    if (!this.piano) return; const { g, timer } = this.piano, t = this.ctx.currentTime; clearInterval(timer);
+    g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(g.gain.value, .0001), t); g.gain.exponentialRampToValueAtTime(.0001, t + .8); this.piano = null;
+  },
+  note(freq, t, dur, s = 1) {
+    const c = this.ctx;
+    [[1, .22], [2, .07], [3, .025], [4.2, .01]].forEach(([h, v]) => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = "sine"; o.frequency.value = freq * h;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v * s, t + .008); g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(dur * 1.8, .9));
+      o.connect(g); g.connect(this.master); o.start(t); o.stop(t + 2.2);
+    });
+  },
+  happyBirthday() {
+    if (!this.ok()) return 0;
+    const N = { G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99 };
+    const song = [["G4", .75], ["G4", .25], ["A4", 1], ["G4", 1], ["C5", 1], ["B4", 2],
+                  ["G4", .75], ["G4", .25], ["A4", 1], ["G4", 1], ["D5", 1], ["C5", 2],
+                  ["G4", .75], ["G4", .25], ["G5", 1], ["E5", 1], ["C5", 1], ["B4", 1], ["A4", 2],
+                  ["F5", .75], ["F5", .25], ["E5", 1], ["C5", 1], ["D5", 1], ["C5", 3]];
+    const beat = .42; let t = this.ctx.currentTime + .15;
+    song.forEach(([n, b]) => { this.note(N[n], t, b * beat); t += b * beat; });
+    return (t - this.ctx.currentTime) * 1000;
+  },
+  setOn(v) { this.on = v; if (this.master) this.master.gain.setTargetAtTime(v ? .7 : 0, this.ctx.currentTime, .05); }
+};
+
+/* ---------------- COUNTDOWN LEADER (film academy leader) ---------------- */
+function runLeader(canvas, from, alive = () => true) {
+  return new Promise(resolve => {
+    canvas.style.display = "block";
+    const ctx = canvas.getContext("2d"), dpr = Math.min(devicePixelRatio || 1, 2);
+    const W = canvas.width = canvas.clientWidth * dpr, H = canvas.height = canvas.clientHeight * dpr;
+    let last = from + 1; const start = performance.now();
+    function frame(now) {
+      if (!alive()) { canvas.style.display = "none"; return resolve(); }
+      const el = (now - start) / 1000, num = from - Math.floor(el);
+      if (num < 1) { canvas.style.display = "none"; return resolve(); }
+      if (num !== last) { last = num; SFX.beep(1000, .12, .22); }
+      const p = el % 1, cx = W / 2, cy = H / 2, r = Math.min(W, H) * .33;
+      ctx.globalAlpha = 1; ctx.fillStyle = "#1c1915"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#3b342c"; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, Math.hypot(W, H), -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = "rgba(232,224,208,.55)"; ctx.lineWidth = 2 * dpr;
+      ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+      ctx.strokeStyle = "#e8e0d0"; ctx.lineWidth = 3 * dpr;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, r * .84, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = .88 + Math.random() * .12; ctx.fillStyle = "#f3ece0";
+      ctx.font = `${r * 1.25}px 'Bebas Neue', Impact, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(num, cx, cy + r * .06);
+      if (Math.random() < .25) { ctx.globalAlpha = .4; ctx.fillStyle = "#fff"; ctx.fillRect(Math.random() * W, 0, 1.5 * dpr, H); }
+      for (let i = 0; i < 6; i++) { ctx.globalAlpha = Math.random() * .5; ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 3 * dpr, 0, 7); ctx.fill(); }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+function flash() { const f = $("#flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
+
+/* ---------------- BUILD PAGE FROM CONFIG ---------------- */
+function build() {
+  document.title = `${CONFIG.fullName} — ${CONFIG.roles.slice(0, 3).join(" · ")}`;
+  $("#presents").textContent = CONFIG.presents;
+  $("#heroName").innerHTML = [...CONFIG.name.toUpperCase()].map((ch, i) => `<span style="--i:${i}">${ch === " " ? "&nbsp;" : esc(ch)}</span>`).join("");
+  $("#tagline").textContent = CONFIG.tagline;
+  if (CONFIG.heroImage) $("#heroPhoto").style.backgroundImage = `url('${CONFIG.heroImage}')`;
+  if (CONFIG.aboutImage) { $("#aboutImg").src = CONFIG.aboutImage; $("#aboutImg").alt = CONFIG.fullName; $("#aboutCap").textContent = CONFIG.fullName; }
+  else document.querySelector(".about-photo").remove();
+  const rl = $("#reelLink"); rl.href = CONFIG.showreel.url || "#reel"; $("#reelMeta").textContent = CONFIG.showreel.label;
+
+  $("#workGrid").innerHTML = CONFIG.works.map((w, i) => `
+    <a class="card reveal-up${w.locked ? " locked" : ""}" data-cat="${esc(w.cat || "film")}" ${w.url && !w.locked ? `href="${esc(w.url)}" target="_blank" rel="noopener"` : `href="#work"`} ${w.locked ? "" : "data-blip"} data-big style="transition-delay:${(i % 3) * 120}ms">
+      <div class="thumb">
+        <span class="cat ${esc(w.cat || "film")}">${w.cat === "tech" ? "Tech" : "Film"}</span>
+        <div class="bg" style="background:radial-gradient(circle at 70% 30%,${w.colors[1]}55,transparent 60%),linear-gradient(135deg,${w.colors[0]},#0b0a09 70%)"></div>
+        <div class="scan"></div>
+        <span class="tc">TC ${esc(w.tc)}</span>
+        <span class="big-num" style="top:auto;bottom:4px;left:14px;right:auto">${String(i + 1).padStart(2, "0")}</span>
+        ${w.locked ? `<div class="stamp">CLASSIFIED</div><div class="lock-note">🔒 ${esc(w.type)}…</div>` : `<span class="mini-play"></span>`}
+      </div>
+      <div class="card-info"><h3>${esc(w.title)}</h3><span>${esc(w.type)} · ${esc(w.year)}</span></div>
+    </a>`).join("");
+
+  $("#tracks").innerHTML = CONFIG.tracks.map((t, ti) => `
+    <div class="track ${t.id}">
+      <div class="track-head"><b>${t.id.toUpperCase()}</b>${esc(t.label)}</div>
+      <div class="track-lane">${t.clips.map((c, ci) => `<div class="clip" data-chime="${ti * 2 + ci}" style="flex:${1 + ((ci * 7 + ti * 3) % 5) * .35};transition-delay:${ti * 150 + ci * 120}ms">${t.id === "a1" ? "" : esc(c)}${t.id === "a1" ? `<span style="position:relative;z-index:1">${esc(c)}</span>` : ""}</div>`).join("")}</div>
+    </div>`).join("");
+
+  $("#engText").textContent = CONFIG.engineerText;
+  $("#filmText").textContent = CONFIG.filmText;
+  const stripColors = CONFIG.works.map(w => w.colors[1]);
+  $("#strip").innerHTML = [...stripColors, ...stripColors, ...stripColors, ...stripColors].map(c => `<div style="background:linear-gradient(135deg,${c}aa,#111)"></div>`).join("");
+
+  $("#aboutText").innerHTML = CONFIG.about.split(/\s+/).map(w => {
+    const hl = /^\*.*\*[.,!?]?$/.test(w); const clean = w.replace(/\*/g, "");
+    return `<span class="${hl ? "hl" : ""}">${esc(clean)}</span>`;
+  }).join(" ");
+
+  $("#socials").innerHTML = CONFIG.socials.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener" data-blip data-big>${esc(s.label)} ↗</a>`).join("");
+  $("#emailText").textContent = CONFIG.email;
+  $("#tName").textContent = CONFIG.fullName;
+
+  $("#clapProd").textContent = CONFIG.fullName; $("#clapDir").textContent = CONFIG.name; $("#clapCam").textContent = CONFIG.name;
+  const d = new Date(); $("#clapDate").textContent = [d.getDate(), d.getMonth() + 1, d.getFullYear() % 100].map(v => String(v).padStart(2, "0")).join(".");
+  const mq = CONFIG.marquee.map(t => `<span>${esc(t)} ✦</span>`).join(""); $("#marquee").innerHTML = mq + mq;
+  $("#stats").innerHTML = CONFIG.stats.map(s => `<div class="stat reveal-up"><b><span data-n="${+s.n}">0</span><em>${esc(s.suffix)}</em></b><small>${esc(s.label)}</small></div>`).join("");
+  if (!CONFIG.birthday.enabled) { document.querySelector(".post-credits").style.display = "none"; $("#secret").remove(); }
+
+  const n = CONFIG.fullName;
+  const credits = [["Directed by", n], ["Edited by", n], ["Written by", n], ["Cinematography", n], ["Color & Sound", n]];
+  $("#creditsRoll").innerHTML = credits.map(([r, v]) => `<div class="credit"><small>${esc(r)}</small><b>${esc(v)}</b></div>`).join("") + `<div class="the-end">THE END</div>`;
+  $("#footName").textContent = `© ${new Date().getFullYear()} ${n}`;
+}
+
+/* ---------------- INTRO ---------------- */
+let introDone = false;
+async function enter(skip) {
+  SFX.init();
+  const gate = $("#gate");
+  if (!skip) {
+    gate.querySelectorAll("small,button").forEach(el => el.style.visibility = "hidden");
+    SFX.startProjector();
+    setTimeout(() => SFX.riser(1.1), 3900);
+    await runLeader($("#leader"), 5);
+    SFX.stopProjector();
+    flash(); SFX.boom();
+  }
+  gate.classList.add("gone");
+  document.body.classList.remove("locked");
+  $("#hero").classList.add("opened");
+  introDone = true;
+  setTimeout(() => SFX.startDrone(), skip ? 0 : 1500);
+  typeRoles();
+  if (CONFIG.birthday.enabled) setTimeout(() => { if (!pillGone) $("#reelPill").classList.add("show"); }, 6000);
+  if (location.hash === "#surprise" && CONFIG.birthday.enabled) setTimeout(playSurprise, skip ? 300 : 2500);
+}
+$("#enterBtn").addEventListener("click", () => enter(false));
+$("#skipBtn").addEventListener("click", () => enter(true));
+if (location.hash === "#surprise") { $("#enterBtn").textContent = "▶ OPEN YOUR GIFT"; $("#gateTop").textContent = "Someone made you something"; }
+
+/* typed roles */
+async function typeRoles() {
+  const el = $("#typed"); let i = 0;
+  await sleep(1800);
+  while (true) {
+    const word = CONFIG.roles[i % CONFIG.roles.length];
+    for (let k = 1; k <= word.length; k++) { el.textContent = word.slice(0, k); if (scrollY < innerHeight * .5 && !$("#bday").classList.contains("open")) SFX.key(); await sleep(70); }
+    await sleep(1600);
+    for (let k = word.length; k >= 0; k--) { el.textContent = word.slice(0, k); await sleep(35); }
+    await sleep(250); i++;
+  }
+}
+
+/* ---------------- HUD: timecode + scene label ---------------- */
+const t0 = performance.now();
+(function tc() {
+  const f = Math.floor((performance.now() - t0) / (1000 / 24)), fr = f % 24, s = Math.floor(f / 24) % 60, m = Math.floor(f / 1440) % 60, h = Math.floor(f / 86400);
+  $("#timecode").textContent = [h, m, s, fr].map(v => String(v).padStart(2, "0")).join(":");
+  requestAnimationFrame(tc);
+})();
+const scenes = [...document.querySelectorAll("[data-scene]")];
+let lastWhoosh = 0;
+const sceneObs = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const idx = scenes.indexOf(e.target) + 1;
+  $("#sceneLabel").textContent = `REEL 01 · SCENE ${String(idx).padStart(2, "0")} — ${e.target.dataset.scene}`;
+  if (introDone && performance.now() - lastWhoosh > 900) { SFX.whoosh(); lastWhoosh = performance.now(); }
+}), { threshold: .45 });
+scenes.forEach(s => sceneObs.observe(s));
+
+/* ---------------- reveals ---------------- */
+const revObs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revObs.unobserve(e.target); } }), { threshold: .15 });
+function observeReveals() { document.querySelectorAll(".reveal-up,.timeline").forEach(el => revObs.observe(el)); }
+
+const creditsObs = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting && !e.target.classList.contains("in")) {
+    e.target.classList.add("in");
+    setTimeout(() => $("#pcBtn").classList.add("show"), 6000);
+  }
+}), { threshold: .5 });
+
+/* typed code in engineer pane */
+const codeLines = `export.render({\n  project:    "short_film_v3",\n  resolution: "3840x2160",\n  fps:        24,\n  color:      "rec709",\n});`;
+const codeObs = new IntersectionObserver(async es => {
+  if (!es[0].isIntersecting) return; codeObs.disconnect();
+  const pre = $("#codeBlock");
+  for (let i = 0; i <= codeLines.length; i++) { pre.textContent = codeLines.slice(0, i) + "▌"; if (i % 2 && codeLines[i] !== " ") SFX.key(); await sleep(32); }
+}, { threshold: .4 });
+
+/* ---------------- split screen ---------------- */
+function setupSplit() {
+  const split = $("#split"), film = $("#filmPane"), div = $("#divider");
+  let last = 50, lastSnd = 0, angle = 0, n = 0;
+  const set = pct => {
+    pct = Math.max(8, Math.min(92, pct)); film.style.clipPath = `inset(0 0 0 ${pct}%)`; div.style.left = pct + "%";
+    const d = pct - last, now = performance.now();
+    $("#build").innerHTML = `$ npm run build <b>▸ ${Math.round(pct)}%</b>`;
+    $("#reelCount").textContent = `REEL ▸ ${Math.round(100 - pct)}%`;
+    if (d < 0) { angle += d * 9; $("#bigReel").style.transform = `rotate(${angle}deg)`; }
+    if (Math.abs(d) > .5 && now - lastSnd > 50 && SFX.ok()) {   // engineer side grows → typing, film side grows → projector
+      if (d > 0) SFX.key(); else { SFX.tick(); if (++n % 4 === 0) SFX.beep(180, .05, .05); }
+      lastSnd = now;
+    }
+    last = pct;
+  };
+  split.addEventListener("pointermove", e => { const r = split.getBoundingClientRect(); set((e.clientX - r.left) / r.width * 100); });
+  split.addEventListener("pointerleave", () => set(50));
+}
+
+/* ---------------- about words light up on scroll ---------------- */
+function aboutScroll() {
+  const sec = $("#about"), words = [...sec.querySelectorAll(".about-text span")];
+  const r = sec.getBoundingClientRect(), vh = innerHeight;
+  const p = Math.max(0, Math.min(1, (vh * .85 - r.top) / (r.height * .9)));
+  const lit = Math.floor(p * words.length * 1.15);
+  words.forEach((w, i) => w.classList.toggle("lit", i < lit));
+}
+addEventListener("scroll", aboutScroll, { passive: true });
+
+/* ---------------- 3D tilt on cards ---------------- */
+function setupTilt() {
+  document.querySelectorAll(".card").forEach(c => {
+    c.addEventListener("pointermove", e => { const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; c.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(10px)`; });
+    c.addEventListener("pointerleave", () => c.style.transform = "");
+  });
+}
+
+/* ---------------- cursor + hover sounds ---------------- */
+function setupCursor() {
+  const cur = $("#cursor"); let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y;
+  addEventListener("pointermove", e => { x = e.clientX; y = e.clientY; });
+  (function loop() { cx += (x - cx) * .2; cy += (y - cy) * .2; cur.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+  document.addEventListener("pointerover", e => {
+    const t = e.target.closest("[data-blip],a,button");
+    if (t && !t.contains(e.relatedTarget)) { if (t.hasAttribute("data-blip")) SFX.blip(); }
+    cur.classList.toggle("big", !!e.target.closest("[data-big],a,button"));
+  });
+}
+
+/* ---------------- sound toggle ---------------- */
+$("#soundBtn").addEventListener("click", () => {
+  SFX.init(); const on = !SFX.on; SFX.setOn(on);
+  $("#soundTxt").textContent = on ? "SOUND ON" : "SOUND OFF";
+  $("#soundBtn").classList.toggle("muted", !on);
+  if (on && introDone) SFX.startDrone();
+});
+
+/* ---------------- CONFETTI ---------------- */
+const Confetti = {
+  parts: [], raf: null,
+  start() {
+    const cv = $("#confetti"), ctx = cv.getContext("2d"), dpr = Math.min(devicePixelRatio || 1, 2);
+    cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr;
+    const cols = ["#ffb547", "#ff6a00", "#fff2d6", "#ff3b30", "#ffd36b", "#f3ece0"];
+    const burst = () => { for (let i = 0; i < 140; i++) this.parts.push({ x: cv.width * (.2 + Math.random() * .6), y: cv.height * .55, vx: (Math.random() - .5) * 18 * dpr, vy: (-Math.random() * 22 - 8) * dpr, w: (6 + Math.random() * 8) * dpr, h: (3 + Math.random() * 5) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[i % cols.length], life: 1 }); };
+    burst(); this.burstTimer = setInterval(() => { for (let i = 0; i < 6; i++) this.parts.push({ x: Math.random() * cv.width, y: -20, vx: (Math.random() - .5) * 2 * dpr, vy: (2 + Math.random() * 3) * dpr, w: (6 + Math.random() * 8) * dpr, h: (3 + Math.random() * 5) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .2, c: cols[Math.floor(Math.random() * cols.length)], life: 1 }); }, 120);
+    const loop = () => {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      this.parts = this.parts.filter(p => p.y < cv.height + 40 && p.life > 0);
+      this.parts.forEach(p => { p.vy += .35 * dpr; p.vx *= .99; p.vy = Math.min(p.vy, 6 * dpr); p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.scale(1, Math.cos(p.r * 2)); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); });
+      this.raf = requestAnimationFrame(loop);
+    };
+    loop();
+  },
+  stop() { cancelAnimationFrame(this.raf); clearInterval(this.burstTimer); this.parts = []; const cv = $("#confetti"); cv.getContext("2d").clearRect(0, 0, cv.width, cv.height); }
+};
+
+/* ---------------- 🎂 POST-CREDITS: a silent film ---------------- */
+let token = 0;
+const E = id => document.getElementById(id);
+const vis = (id, on = true) => E(id).classList.toggle("vis", on);
+function move(id, x, y, ms = 0, ease = "linear") { const el = E(id); el.style.transition = ms ? `transform ${ms}ms ${ease}` : "none"; el.style.transform = `translate(${x}px,${y}px)`; }
+
+async function scene(html, ms, alive) {
+  const st = $("#stage"); st.innerHTML = `<div class="scene">${html}</div>`;
+  const s = st.firstChild; await sleep(30); s.classList.add("in");
+  if (ms === Infinity) return s;
+  await sleep(ms); if (!alive()) return; s.classList.add("out"); await sleep(750);
+}
+async function card(small, text, ms, alive) {
+  if (!alive()) return;
+  const it = E("intertitle"); E("itSmall").textContent = small; E("itText").innerHTML = text;
+  it.classList.add("show"); await sleep(ms); if (!alive()) return;
+  it.classList.remove("show"); await sleep(550);
+}
+function resetStory() {
+  move("sum", -150, 720); move("baby", 985, 668);
+  E("lid").style.transform = ""; E("sum").classList.remove("walking"); E("binG").classList.remove("rattle");
+  ["sTag", "censor", "bang", "psss", "bubble", "babyTag", "glow", "rays", "puddle"].forEach(id => vis(id, false));
+  E("intertitle").classList.remove("show");
+}
+async function walk(x, ms, alive) {
+  E("sum").classList.add("walking"); move("sum", x, 720, ms);
+  const steps = setInterval(() => SFX.footstep(), 210);
+  await sleep(ms); clearInterval(steps); E("sum").classList.remove("walking");
+}
+function cleanupStory() {
+  SFX.stopPiano(); E("silent").classList.remove("on"); resetStory();
+  document.querySelectorAll(".bday-roll,.polaroid,.bloopers-title").forEach(r => r.remove());
+  $("#camera").classList.remove("in"); $("#leader2").style.display = "none";
+}
+
+async function playSurprise() {
+  SFX.init();
+  const my = ++token, alive = () => my === token;
+  const B = CONFIG.birthday, ov = $("#bday");
+  ov.classList.add("open"); document.body.classList.add("locked"); $("#stage").innerHTML = "";
+  cleanupStory(); Confetti.stop(); E("finalBg").className = "final-bg";
+  SFX.droneTo(.0001, 1);
+  await sleep(500); if (!alive()) return;
+  SFX.startProjector();
+  await runLeader($("#leader2"), 3, alive); if (!alive()) return;
+
+  // ---- the silent film ----
+  resetStory(); E("silent").classList.add("on"); SFX.startPiano();
+  await card("A SILENT PICTURE", `${esc(B.from)}<br><em>present</em>`, 2800, alive);
+  await card("", `<em>The Origin of</em><span class="big">${esc(CONFIG.name.toUpperCase())}</span>`, 3200, alive);
+  await card("CHAPTER ONE", "Hyderabad.<br>A long, long time ago.", 2800, alive);
+  await card("", "Young Sumanth was sent to the kirana store<br>to buy <em>one packet of milk.</em>", 3800, alive); if (!alive()) return;
+
+  vis("sTag"); await walk(590, 4000, alive); if (!alive()) return;
+  vis("sTag", false);
+  await card("", "On the way, nature called.<br><em>Sumanth answered.</em>", 3200, alive); if (!alive()) return;
+
+  vis("censor"); vis("psss"); vis("puddle"); SFX.trickle(3.2);
+  await sleep(2300); if (!alive()) return;
+  vis("bubble"); E("binG").classList.add("rattle"); SFX.cry();
+  await sleep(280); vis("psss", false); vis("bang"); SFX.boing();
+  E("sumInner").classList.remove("jump"); void E("sumInner").getBBox(); E("sumInner").classList.add("jump");
+  setTimeout(() => SFX.cry(), 950); setTimeout(() => SFX.cry(), 1900);
+  await sleep(1300); vis("censor", false);
+  await sleep(1500); if (!alive()) return;
+  vis("bubble", false); vis("bang", false); E("binG").classList.remove("rattle");
+  await card("", "Then he heard it.<br>Crying.<br><em>From inside the dustbin.</em>", 3400, alive); if (!alive()) return;
+
+  await walk(830, 1700, alive); if (!alive()) return;
+  await sleep(400);
+  E("lid").style.transform = "rotate(-118deg)"; SFX.clang();
+  await sleep(450); vis("glow"); vis("rays"); SFX.choir(4.6);
+  move("baby", 985, 445, 2400, "cubic-bezier(.2,.7,.2,1)");
+  await sleep(2600); if (!alive()) return;
+  vis("babyTag"); SFX.cry();
+  await sleep(2800); if (!alive()) return;
+
+  await card("", "Yes.<br><em>The beard was already there.</em>", 3000, alive);
+  await card("", "He carried the baby to the nearest house.<br>The Eluri family took one look and sighed:<br><em>“Fine. We’ll keep him.”</em>", 5400, alive);
+  await card("", "Sumanth never got the milk.", 3000, alive);
+  await card("", "And that baby grew up to be…", 2600, alive); if (!alive()) return;
+  SFX.stopPiano(); E("silent").classList.remove("on"); SFX.stopProjector();
+  await sleep(700); if (!alive()) return;
+
+  // ---- the evidence: instant camera pops out polaroids ----
+  if (B.photos && B.photos.length) {
+    const title = document.createElement("div"); title.className = "bloopers-title"; title.textContent = "— THE EVIDENCE —"; ov.appendChild(title);
+    const cam = $("#camera"), fl = $("#camFlash"), pols = [], spread = innerWidth < 700 ? .3 : 1;
+    cam.classList.add("in"); SFX.whoosh(); await sleep(900);
+    for (let i = 0; i < B.photos.length; i++) {
+      if (!alive()) return;
+      const p = B.photos[i], el = document.createElement("div"); el.className = "polaroid";
+      const n = B.photos.length;
+      el.style.setProperty("--r", (Math.random() * 14 - 7) + "deg");
+      el.style.setProperty("--x", ((n > 1 ? -34 + i * 68 / (n - 1) : 0) * spread) + "vw");
+      el.style.setProperty("--y", (-6 + Math.random() * 6) + "vh");
+      el.style.zIndex = 3 + i;
+      el.innerHTML = `<div class="ph"${p.src ? ` style="background-image:url('${esc(p.src)}')"` : ""}>${p.src ? "" : "📸"}</div><p>${esc(p.caption)}</p>`;
+      ov.appendChild(el); pols.push(el);
+      fl.classList.remove("fire"); void fl.offsetWidth; fl.classList.add("fire"); SFX.shutter();
+      await sleep(120); el.classList.add("eject");
+      await sleep(450); el.classList.add("in");
+      await sleep(1700);
+    }
+    if (!alive()) return;
+    await sleep(600); SFX.riser(1.3); cam.classList.remove("in");
+    pols.forEach((el, i) => setTimeout(() => el.classList.add("gone"), i * 90));
+    await sleep(1300); pols.forEach(el => el.remove()); title.remove(); if (!alive()) return;
+  }
+  finale(alive);
+}
+
+async function finale(alive) {
+  const B = CONFIG.birthday, fb = E("finalBg");
+  if (CONFIG.heroImage) fb.style.backgroundImage = `url('${CONFIG.heroImage}')`;
+  flash(); SFX.boom(); fb.classList.add("show"); setTimeout(() => fb.classList.add("color"), 400);
+  await scene(`<div class="hb-pre">And now, in colour.</div><div class="hb">HAPPY<br>BIRTHDAY</div><div class="hb-name">${esc(CONFIG.name.toUpperCase())}</div>
+    <p class="hb-msg">${esc(B.message)}</p><div class="hb-from">— ${esc(B.from)}</div>
+    <div class="bday-actions"><button id="replaySong" data-blip>♪ Play the song again</button><button id="replayAll" data-blip>↻ Replay the film</button><button id="backSite" data-blip>Back to the portfolio</button></div>`, Infinity, alive);
+  Confetti.start(); SFX.applause(5);
+  setTimeout(() => { if (alive()) SFX.happyBirthday(); }, 2200);
+  $("#replaySong").onclick = () => SFX.happyBirthday();
+  $("#replayAll").onclick = () => { Confetti.stop(); SFX.rewind(); setTimeout(playSurprise, 700); };
+  $("#backSite").onclick = closeSurprise;
+}
+function skipToEnd() {
+  const my = ++token, alive = () => my === token;
+  cleanupStory(); SFX.stopProjector(); $("#stage").innerHTML = ""; E("finalBg").className = "final-bg";
+  finale(alive);
+}
+function closeSurprise() {
+  token++; Confetti.stop(); SFX.stopProjector(); cleanupStory();
+  E("finalBg").className = "final-bg"; $("#stage").innerHTML = "";
+  $("#bday").classList.remove("open"); document.body.classList.remove("locked");
+  SFX.droneTo(.05, 2);
+}
+$("#pcBtn").addEventListener("click", playSurprise);
+$("#secretBtn").addEventListener("click", () => { hidePill(); playSurprise(); });
+$("#secretBtn").addEventListener("pointerenter", () => SFX.riser(.5));
+let pillGone = false;
+function hidePill() { pillGone = true; $("#reelPill").classList.remove("show"); }
+$("#reelPill").addEventListener("click", e => {
+  if (e.target.id === "pillX") { hidePill(); return; }
+  hidePill(); document.documentElement.style.scrollBehavior = "smooth"; $("#secret").scrollIntoView();
+});
+new IntersectionObserver(es => { if (es[0].isIntersecting) hidePill(); }, { threshold: .3 }).observe($("#secret"));
+$("#bdayClose").addEventListener("click", closeSurprise);
+$("#bdaySkip").addEventListener("click", skipToEnd);
+
+/* ---------------- clapperboard ---------------- */
+let take = 1;
+function snapClapper() {
+  const c = $("#clapper"), sec = $("#clapSec");
+  c.classList.remove("snap");
+  setTimeout(() => { c.classList.add("snap"); setTimeout(() => { SFX.clap(); sec.classList.remove("shake"); void sec.offsetWidth; sec.classList.add("shake"); }, 170); }, 280);
+}
+const clapObs = new IntersectionObserver(es => { if (es[0].isIntersecting && introDone) { snapClapper(); clapObs.disconnect(); } }, { threshold: .6 });
+$("#clapper").addEventListener("click", () => { take++; $("#clapTake").textContent = take; snapClapper(); });
+
+/* ---------------- stats count-up ---------------- */
+const statObs = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; statObs.unobserve(e.target);
+  const el = e.target.querySelector("[data-n]"), N = +el.dataset.n, t0 = performance.now(), D = 1800; let lastTick = 0;
+  (function f(now) {
+    const p = Math.min(1, (now - t0) / D); el.textContent = Math.round(N * (1 - Math.pow(1 - p, 3))).toLocaleString("en-IN");
+    if (now - lastTick > 90 && p < 1) { SFX.beep(2200, .02, .025); lastTick = now; }
+    if (p < 1) requestAnimationFrame(f);
+  })(t0);
+}), { threshold: .5 });
+
+/* ---------------- extra interaction sounds ---------------- */
+function setupSounds() {
+  $("#tracks").addEventListener("pointerover", e => { const c = e.target.closest(".clip"); if (c && !c.contains(e.relatedTarget)) SFX.chime(+c.dataset.chime); });
+  document.querySelectorAll(".card").forEach(c => {
+    if (c.classList.contains("locked")) {
+      c.addEventListener("pointerenter", () => SFX.glitch());
+      c.addEventListener("click", e => { e.preventDefault(); SFX.glitch(); });
+    } else c.addEventListener("click", () => SFX.shutter());
+  });
+  $("#reelLink").addEventListener("click", () => SFX.shutter());
+  $("#socials").addEventListener("pointerenter", () => SFX.tear());
+  addEventListener("scroll", () => { $("#reelIcon").style.transform = `rotate(${scrollY * .6}deg)`; }, { passive: true });
+}
+
+/* ---------------- work filters ---------------- */
+$("#filters").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#filters button").forEach(x => x.classList.toggle("on", x === b));
+  SFX.whoosh();
+  document.querySelectorAll(".card").forEach(c => c.classList.toggle("hide", b.dataset.f !== "all" && c.dataset.cat !== b.dataset.f));
+});
+
+/* ---------------- go ---------------- */
+build(); observeReveals(); setupSplit(); setupTilt(); setupCursor(); setupSounds();
+creditsObs.observe($("#credits")); codeObs.observe($("#split")); clapObs.observe($("#clapper"));
+document.querySelectorAll(".stat").forEach(s => statObs.observe(s));
+</script>
+</body>
+</html>
